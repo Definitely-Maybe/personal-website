@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 560" role="img" aria-label="夜行短歌的风格化封面">
+  <rect width="420" height="560" fill="#263024"/>
+  <path d="M0 120C100 70 182 180 272 124S370 80 420 110V560H0z" fill="#5f8f86"/>
+  <circle cx="312" cy="118" r="42" fill="#dcebe4"/>
+  <text x="54" y="470" fill="#fffefa" font-family="serif" font-size="48">夜行短歌</text>
+</svg>

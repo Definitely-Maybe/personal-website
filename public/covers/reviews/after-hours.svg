@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 560" role="img" aria-label="After Hours 的风格化封面">
+  <rect width="420" height="560" fill="#161b19"/>
+  <circle cx="300" cy="140" r="82" fill="#b4934f"/>
+  <path d="M0 560L420 190V560z" fill="#587f74"/>
+  <text x="42" y="482" fill="#fffefa" font-family="serif" font-size="42">After Hours</text>
+</svg>
