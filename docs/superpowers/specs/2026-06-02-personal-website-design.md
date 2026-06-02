@@ -77,7 +77,7 @@ Reviews page for books, music, and film/TV. The page uses three tabs:
 
 The navigation label is "书影音". The route is `/reviews`.
 
-Review entries should include covers. Music can use square covers; books and film/TV can use poster-like vertical covers. V1 may use locally stored cover artwork or stylized placeholder covers until the author supplies final assets.
+Review entries should include covers. The source artwork may have different native ratios, but the list UI should render every cover inside a consistent cover slot so cards align cleanly. V1 may use locally stored cover artwork or stylized placeholder covers until the author supplies final assets.
 
 ### `/timeline`
 

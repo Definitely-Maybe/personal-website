@@ -1375,7 +1375,7 @@ Append to `src/styles/global.css`:
 
 .review-card {
   display: grid;
-  grid-template-columns: 118px minmax(0, 1fr);
+  grid-template-columns: 132px minmax(0, 1fr);
   gap: 18px;
   min-height: 236px;
   padding: 16px;
@@ -1385,8 +1385,8 @@ Append to `src/styles/global.css`:
 }
 
 .review-card__cover {
-  width: 100%;
-  aspect-ratio: 1;
+  width: 132px;
+  height: 174px;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid var(--line);
@@ -1420,7 +1420,12 @@ Append to `src/styles/global.css`:
 
 @media (max-width: 520px) {
   .review-card {
-    grid-template-columns: 88px minmax(0, 1fr);
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+
+  .review-card__cover {
+    width: 96px;
+    height: 126px;
   }
 }
 ```
