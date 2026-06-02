@@ -1225,11 +1225,6 @@ const tags = [...new Set(essays.flatMap((essay) => essay.data.tags))];
         </div>
       </section>
 
-      <section>
-        <h2>和这些文字聊天</h2>
-        <a class="essay-chat-link" href="/?prompt=%E9%9A%8F%E6%9C%BA%E8%81%8A%E4%B8%80%E7%AF%87%E9%9A%8F%E7%AC%94">随机聊一篇随笔</a>
-        <a class="essay-chat-link" href="/?prompt=%E8%BF%99%E4%BA%9B%E9%9A%8F%E7%AC%94%E5%8F%8D%E5%A4%8D%E5%9C%A8%E5%86%99%E4%BB%80%E4%B9%88">这些随笔反复在写什么？</a>
-      </section>
     </aside>
   </div>
 </ContentLayout>
@@ -1379,8 +1374,7 @@ Append to `src/styles/global.css`:
   gap: 8px;
 }
 
-.filter-chip,
-.essay-chat-link {
+.filter-chip {
   border: 1px solid var(--line);
   border-radius: 999px;
   background: #fff;
@@ -1392,12 +1386,6 @@ Append to `src/styles/global.css`:
 .filter-chip.is-active {
   background: var(--accent-soft);
   color: var(--text);
-}
-
-.essay-chat-link {
-  display: block;
-  border-radius: 10px;
-  margin-bottom: 8px;
 }
 
 @media (max-width: 900px) {

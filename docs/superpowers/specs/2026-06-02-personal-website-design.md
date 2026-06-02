@@ -68,7 +68,7 @@ On mobile, the sidebar is collapsed behind a menu button.
 
 Essay list page with summaries, dates, tags, and optional mood labels.
 
-The essay index should use the available right-side workspace. The main column lists essays; the right column is a filtering index with time filters and tag filters. The right column may also include prompts that route back into the chat experience, such as "随机聊一篇随笔".
+The essay index should use the available right-side workspace. The main column lists essays; the right column is a filtering index with time filters and tag filters.
 
 ### `/essays/[slug]`
 
