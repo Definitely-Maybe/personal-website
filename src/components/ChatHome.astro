@@ -1,0 +1,79 @@
+---
+import { suggestedPrompts } from '../data/chatPresets';
+---
+
+<section class="chat-home" data-chat-home>
+  <div class="chat-home__intro" data-chat-intro>
+    <p class="chat-home__date">2026 · 私人对话入口</p>
+    <h1>我们从哪里开始呢？</h1>
+  </div>
+
+  <div class="chat-thread" data-chat-thread aria-live="polite"></div>
+
+  <div class="chat-home__composer">
+    <form class="chat-box" data-chat-form>
+      <span class="chat-box__plus" aria-hidden="true">+</span>
+      <label class="sr-only" for="chat-input">输入问题</label>
+      <input id="chat-input" name="message" placeholder="问我一首歌、一篇随笔，或者一个适合今天的问题" autocomplete="off" data-chat-input />
+      <button type="submit">发送</button>
+    </form>
+    <div class="prompt-row" aria-label="建议问题">
+      {suggestedPrompts.map((prompt) => (
+        <button type="button" data-prompt={prompt}>{prompt}</button>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { getSimulatedReply } from '../data/chatPresets';
+
+  const home = document.querySelector('[data-chat-home]');
+  const form = document.querySelector('[data-chat-form]');
+  const input = document.querySelector('[data-chat-input]');
+  const thread = document.querySelector('[data-chat-thread]');
+  const promptButtons = document.querySelectorAll('[data-prompt]');
+
+  function addMessage(role: 'user' | 'assistant', text: string) {
+    const message = document.createElement('div');
+    message.className = `chat-message chat-message--${role}`;
+    message.textContent = text;
+    thread?.append(message);
+    message.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    return message;
+  }
+
+  function submitMessage(text: string) {
+    const value = text.trim();
+    if (!value) return;
+
+    home?.classList.add('chat-home--active');
+    addMessage('user', value);
+    const pending = addMessage('assistant', '正在整理一小段回答');
+    pending.classList.add('chat-message--typing');
+
+    window.setTimeout(() => {
+      pending.classList.remove('chat-message--typing');
+      pending.textContent = getSimulatedReply(value);
+    }, 520);
+  }
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const value = input instanceof HTMLInputElement ? input.value : '';
+    submitMessage(value);
+    if (input instanceof HTMLInputElement) input.value = '';
+  });
+
+  promptButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const prompt = button.getAttribute('data-prompt') ?? '';
+      submitMessage(prompt);
+    });
+  });
+
+  const promptFromUrl = new URLSearchParams(window.location.search).get('prompt');
+  if (promptFromUrl) {
+    window.setTimeout(() => submitMessage(promptFromUrl), 160);
+  }
+</script>
