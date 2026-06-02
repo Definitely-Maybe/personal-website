@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  reviews: CollectionEntry<'reviews'>[];
+}
+
+const { reviews } = Astro.props;
+const categories = [
+  { key: 'music', label: '音乐' },
+  { key: 'book', label: '书籍' },
+  { key: 'film', label: '影视' },
+] as const;
+---
+
+<div class="review-tabs">
+  <div class="review-tabs__controls" role="tablist" aria-label="书影音分类">
+    {categories.map((category, index) => (
+      <button type="button" role="tab" aria-selected={index === 0 ? 'true' : 'false'} data-review-tab={category.key}>
+        {category.label}
+      </button>
+    ))}
+  </div>
+
+  {categories.map((category, index) => (
+    <section class="review-panel" data-review-panel={category.key} hidden={index !== 0}>
+      {reviews.filter((review) => review.data.category === category.key).map((review) => (
+        <article class="review-card">
+          <img class="review-card__cover" src={review.data.cover.src} alt={review.data.cover.alt} loading="lazy" />
+          <div class="review-card__body">
+            <p class="review-card__meta">{review.data.creator} · {review.data.year}</p>
+            <h2>{review.data.title}</h2>
+            <p>{review.data.summary}</p>
+            <strong>{review.data.rating.toFixed(1)}</strong>
+            <div class="tag-row">
+              {review.data.tags.map((tag) => <span>{tag}</span>)}
+              {review.data.moments.map((moment) => <span>{moment}</span>)}
+            </div>
+          </div>
+        </article>
+      ))}
+    </section>
+  ))}
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('[data-review-tab]');
+  const panels = document.querySelectorAll('[data-review-panel]');
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const selected = tab.getAttribute('data-review-tab');
+      tabs.forEach((item) => item.setAttribute('aria-selected', String(item === tab)));
+      panels.forEach((panel) => {
+        panel.toggleAttribute('hidden', panel.getAttribute('data-review-panel') !== selected);
+      });
+    });
+  });
+</script>
