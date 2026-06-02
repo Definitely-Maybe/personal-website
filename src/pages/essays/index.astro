@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import ContentLayout from '../../layouts/ContentLayout.astro';
+
+const essays = (await getCollection('essays')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const years = [...new Set(essays.map((essay) => String(essay.data.date.getFullYear())))];
+const tags = [...new Set(essays.flatMap((essay) => essay.data.tags))];
+---
+
+<ContentLayout title="随笔" eyebrow="Essays" description="生活里一些没有被整理成结论的片段，先放在这里。">
+  <div class="essay-index">
+    <div class="entry-list" data-essay-list>
+      {essays.map((essay) => (
+        <a class="entry-card" href={`/essays/${essay.slug}`} data-year={essay.data.date.getFullYear()} data-tags={essay.data.tags.join(',')}>
+          <time datetime={essay.data.date.toISOString()}>{essay.data.date.toLocaleDateString('zh-CN')}</time>
+          <div>
+            <h2>{essay.data.title}</h2>
+            <p>{essay.data.summary}</p>
+            <div class="tag-row">
+              {essay.data.mood && <span>{essay.data.mood}</span>}
+              {essay.data.tags.map((tag) => <span>{tag}</span>)}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <aside class="essay-filter" aria-label="随笔筛选">
+      <section>
+        <h2>时间</h2>
+        <div class="filter-row">
+          <button type="button" class="filter-chip is-active" data-filter-year="all">全部</button>
+          {years.map((year) => <button type="button" class="filter-chip" data-filter-year={year}>{year}</button>)}
+        </div>
+      </section>
+
+      <section>
+        <h2>标签</h2>
+        <div class="filter-row">
+          <button type="button" class="filter-chip is-active" data-filter-tag="all">全部</button>
+          {tags.map((tag) => <button type="button" class="filter-chip" data-filter-tag={tag}>{tag}</button>)}
+        </div>
+      </section>
+    </aside>
+  </div>
+</ContentLayout>
+
+<script>
+  const yearButtons = document.querySelectorAll('[data-filter-year]');
+  const tagButtons = document.querySelectorAll('[data-filter-tag]');
+  const entries = document.querySelectorAll('[data-year][data-tags]');
+  let selectedYear = 'all';
+  let selectedTag = 'all';
+
+  function updateActive(buttons: NodeListOf<Element>, selectedValue: string, attribute: string) {
+    buttons.forEach((button) => {
+      button.classList.toggle('is-active', button.getAttribute(attribute) === selectedValue);
+    });
+  }
+
+  function applyFilters() {
+    entries.forEach((entry) => {
+      const yearMatches = selectedYear === 'all' || entry.getAttribute('data-year') === selectedYear;
+      const tagList = (entry.getAttribute('data-tags') ?? '').split(',');
+      const tagMatches = selectedTag === 'all' || tagList.includes(selectedTag);
+      entry.toggleAttribute('hidden', !(yearMatches && tagMatches));
+    });
+    updateActive(yearButtons, selectedYear, 'data-filter-year');
+    updateActive(tagButtons, selectedTag, 'data-filter-tag');
+  }
+
+  yearButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedYear = button.getAttribute('data-filter-year') ?? 'all';
+      applyFilters();
+    });
+  });
+
+  tagButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedTag = button.getAttribute('data-filter-tag') ?? 'all';
+      applyFilters();
+    });
+  });
+</script>
