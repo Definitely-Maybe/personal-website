@@ -370,6 +370,59 @@ button {
   font-weight: 560;
 }
 
+.timeline-axis {
+  list-style: none;
+  margin: 36px 0 0;
+  padding: 0 0 0 174px;
+  position: relative;
+}
+
+.timeline-axis::before {
+  content: "";
+  position: absolute;
+  left: 138px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--line-strong);
+}
+
+.timeline-axis li {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 62px;
+  position: relative;
+  margin-left: -174px;
+  padding-bottom: 42px;
+}
+
+.timeline-axis li::before {
+  content: "";
+  position: absolute;
+  left: 132px;
+  top: 8px;
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.timeline-axis time {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.timeline-axis h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+}
+
+.timeline-axis p {
+  margin: 0;
+  color: var(--muted);
+}
+
 @media (max-width: 980px) {
   .review-panel {
     grid-template-columns: 1fr;
@@ -384,6 +437,27 @@ button {
   .review-card__cover {
     width: 96px;
     height: 126px;
+  }
+}
+
+@media (max-width: 640px) {
+  .timeline-axis {
+    padding-left: 28px;
+  }
+
+  .timeline-axis::before {
+    left: 6px;
+  }
+
+  .timeline-axis li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  .timeline-axis li::before {
+    left: -28px;
   }
 }
 
