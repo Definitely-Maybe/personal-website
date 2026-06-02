@@ -1,0 +1,64 @@
+:root {
+  color-scheme: light;
+  --bg: #fbfaf4;
+  --panel: #edf3e9;
+  --panel-strong: #e2eadf;
+  --text: #20251f;
+  --muted: #626b5f;
+  --line: #d9dfd2;
+  --line-strong: #c8d3c2;
+  --accent: #587f74;
+  --accent-soft: #dcebe4;
+  --gold: #b4934f;
+  --white: #fffefa;
+  --display-font: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
+  --body-font: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-family: var(--body-font);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background:
+    linear-gradient(rgba(32, 37, 31, 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(32, 37, 31, 0.018) 1px, transparent 1px),
+    var(--bg);
+  background-size: 28px 28px;
+  color: var(--text);
+}
+
+body {
+  line-height: 1.65;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
