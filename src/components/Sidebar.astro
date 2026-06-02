@@ -1,0 +1,41 @@
+---
+const modules = [
+  { href: '/', label: '和我聊天' },
+  { href: '/essays', label: '随笔' },
+  { href: '/reviews', label: '书影音' },
+  { href: '/timeline', label: '时间线' },
+  { href: '/guestbook', label: '访客簿' },
+  { href: '/about', label: '关于' },
+];
+
+const chats = ['今天适合听什么？', '你最近在想什么？', '随机聊一篇随笔'];
+const pathname = Astro.url.pathname;
+
+function isActive(href: string) {
+  if (href === '/') return pathname === '/';
+  return pathname.startsWith(href);
+}
+---
+
+<aside class="sidebar" aria-label="站点导航">
+  <div class="sidebar__brand">
+    <a href="/">未命名的小站</a>
+    <span>写作、书影音和一些缓慢整理的念头</span>
+  </div>
+
+  <nav class="sidebar__modules" aria-label="主要模块">
+    {modules.map((item) => (
+      <a href={item.href} class:list={{ 'is-active': isActive(item.href) }}>
+        <span aria-hidden="true"></span>
+        {item.label}
+      </a>
+    ))}
+  </nav>
+
+  <div class="sidebar__chats">
+    <p>聊天</p>
+    {chats.map((chat) => (
+      <a href={`/?prompt=${encodeURIComponent(chat)}`}>{chat}</a>
+    ))}
+  </div>
+</aside>
