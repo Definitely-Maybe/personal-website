@@ -1,0 +1,39 @@
+---
+import GuestbookForm from '../components/GuestbookForm.astro';
+import ContentLayout from '../layouts/ContentLayout.astro';
+
+const visitors = [
+  {
+    name: '林间',
+    time: '刚刚访问',
+    message: '这里的首页很像一个能慢慢靠近的入口。希望以后能看到更多音乐记录。',
+  },
+  {
+    name: 'Moon',
+    time: '昨天访问',
+    message: '随机聊一篇随笔这个入口很好，像抽到一张小纸条。',
+  },
+  {
+    name: '周末读者',
+    time: '三天前访问',
+    message: '时间线那条轴线很安静，不像在展示成就，更像在标记生活。',
+  },
+];
+---
+
+<ContentLayout title="访客簿" eyebrow="Guestbook">
+  <div class="guestbook-head">
+    <p class="lead">最近来过的人，和他们留下的一点痕迹。</p>
+    <GuestbookForm />
+  </div>
+
+  <div class="visitor-grid">
+    {visitors.map((visitor) => (
+      <article class="visitor-card">
+        <p class="visitor-card__meta">{visitor.time}</p>
+        <h2>{visitor.name}</h2>
+        <p>{visitor.message}</p>
+      </article>
+    ))}
+  </div>
+</ContentLayout>

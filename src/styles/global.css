@@ -423,6 +423,108 @@ button {
   color: var(--muted);
 }
 
+.guestbook-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.guestbook-open {
+  border: 0;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--white);
+  padding: 10px 16px;
+}
+
+.visitor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.visitor-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  background: rgba(255, 254, 250, 0.82);
+}
+
+.visitor-card__meta,
+.visitor-card p {
+  color: var(--muted);
+}
+
+.visitor-card h2 {
+  margin: 4px 0 6px;
+  font-size: 1.15rem;
+}
+
+.guestbook-dialog {
+  width: min(520px, calc(100% - 32px));
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 28px 70px rgba(32, 37, 31, 0.14);
+}
+
+.guestbook-dialog::backdrop {
+  background: rgba(32, 37, 31, 0.18);
+}
+
+.guestbook-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.guestbook-dialog__head button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--muted);
+  padding: 6px 10px;
+}
+
+.guestbook-form {
+  display: grid;
+  gap: 16px;
+}
+
+.guestbook-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.guestbook-form input,
+.guestbook-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--white);
+  color: var(--text);
+}
+
+.guestbook-form button {
+  justify-self: start;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  padding: 9px 16px;
+  color: var(--muted);
+}
+
+.guestbook-form p {
+  color: var(--muted);
+}
+
 @media (max-width: 980px) {
   .review-panel {
     grid-template-columns: 1fr;
@@ -653,5 +755,14 @@ button {
     position: static;
     border-left: 0;
     padding-left: 0;
+  }
+
+  .guestbook-head {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .visitor-grid {
+    grid-template-columns: 1fr;
   }
 }
