@@ -33,6 +33,11 @@ The homepage is the AI chat experience.
 - Loading state for simulated replies.
 - Sidebar navigation.
 
+The chat has two visual states:
+
+- Initial state: opening line and composer are centered, like a quiet ChatGPT-style start screen.
+- Active conversation state: after the visitor sends a message or clicks a prompt, the message thread appears and the composer moves to the bottom of the main area. Simulated replies should appear with a streaming/typing state before resolving.
+
 The AI is presented as a conversational persona derived from the author's public writing and hidden persona configuration, not as the author being personally online.
 
 ### Sidebar
@@ -62,6 +67,8 @@ On mobile, the sidebar is collapsed behind a menu button.
 ### `/essays`
 
 Essay list page with summaries, dates, tags, and optional mood labels.
+
+The essay index should use the available right-side workspace. The main column lists essays; the right column is a filtering index with time filters and tag filters. The right column may also include prompts that route back into the chat experience, such as "随机聊一篇随笔".
 
 ### `/essays/[slug]`
 
@@ -97,9 +104,10 @@ Public visitors see only public event fields. Private meaning or commentary is n
 
 Semi-real guestbook.
 
-- Shows a form with name and message fields.
+- Shows recent visitors and their messages as static/sample entries in v1.
+- Has a "留下留言" action button.
+- Clicking the button opens a modal/subwindow with name and message fields.
 - Submit button is disabled or labeled as not yet open.
-- Shows a quiet empty state.
 - No real submission in v1.
 
 ### `/about`
@@ -335,12 +343,14 @@ Suggested palette:
 - The opening line is visually central.
 - The input box is rounded but not overly cute.
 - Suggested prompts are lightweight controls.
+- After a message is sent, the composer moves to the bottom and the interface becomes a normal chat transcript.
 - Chat messages should feel calm and readable.
 - Content pages prioritize reading.
+- Essay indexes should include time and tag filtering controls in the right-side index area.
 - Reviews have a light archive/catalog feeling.
 - Reviews should occupy the available right-side workspace and use cover-led entries rather than tiny text-only cards.
 - Timeline has a coordinate-axis feeling.
-- Guestbook feels quiet and expectant.
+- Guestbook feels quiet and expectant while still showing recent visitors/messages.
 
 ## First Version Scope
 
@@ -352,11 +362,13 @@ V1 includes:
 - Opening line.
 - Chat input.
 - Simulated chat messages.
+- Chat active state where the composer moves to the bottom after the first message.
 - Sidebar with modules and chat list.
 - Essays list and detail pages.
+- Essay time and tag filters.
 - Reviews page with music/book/film tabs.
 - Coordinate-axis-style timeline.
-- Semi-real guestbook with inactive form.
+- Semi-real guestbook with recent visitor/message entries and inactive modal form.
 - About page.
 - Hidden persona configuration file.
 - Sample content.

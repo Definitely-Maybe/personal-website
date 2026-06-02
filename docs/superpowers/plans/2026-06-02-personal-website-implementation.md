@@ -37,6 +37,7 @@ Create this structure:
 │   ├── content/
 │   │   ├── config.ts
 │   │   ├── essays/
+│   │   │   ├── hold-the-sound.mdx
 │   │   │   ├── night-walk.mdx
 │   │   │   └── small-room.mdx
 │   │   ├── reviews/
@@ -460,6 +461,23 @@ visibility: public
 我一直想要一个小房间，里面可以放下音乐、文字、犹豫和一些还没有成形的判断。
 
 这个网站大概就是这样的房间。
+```
+
+Create `src/content/essays/hold-the-sound.mdx`:
+
+```mdx
+---
+title: 把声音留住
+date: 2026-05-28
+summary: 有些专辑不是被听完，而是被反复带回某个时刻。
+tags: [音乐, 记忆]
+mood: 怀旧
+visibility: public
+---
+
+我有时候会觉得，音乐不是背景，也不是装饰。它更像某种能保存空气湿度的容器。
+
+一首歌被反复播放以后，就会和某段路、某个晚上、某种还没说出口的情绪绑在一起。
 ```
 
 Create `src/content/reviews/album-after-hours.mdx`:
@@ -929,25 +947,30 @@ import { suggestedPrompts } from '../data/chatPresets';
 ---
 
 <section class="chat-home" data-chat-home>
-  <div class="chat-home__center">
+  <div class="chat-home__intro" data-chat-intro>
     <h1>我们从哪里开始呢？</h1>
-    <form class="chat-box" data-chat-form>
-      <label class="sr-only" for="chat-input">输入问题</label>
-      <input id="chat-input" name="message" placeholder="有问题，尽管问" autocomplete="off" data-chat-input />
-      <button type="submit">发送</button>
-    </form>
     <div class="prompt-row" aria-label="建议问题">
       {suggestedPrompts.map((prompt) => (
         <button type="button" data-prompt={prompt}>{prompt}</button>
       ))}
     </div>
-    <div class="chat-thread" data-chat-thread aria-live="polite"></div>
+  </div>
+
+  <div class="chat-thread" data-chat-thread aria-live="polite"></div>
+
+  <div class="chat-home__composer">
+    <form class="chat-box" data-chat-form>
+      <label class="sr-only" for="chat-input">输入问题</label>
+      <input id="chat-input" name="message" placeholder="有问题，尽管问" autocomplete="off" data-chat-input />
+      <button type="submit">发送</button>
+    </form>
   </div>
 </section>
 
 <script>
   import { getSimulatedReply } from '../data/chatPresets';
 
+  const home = document.querySelector('[data-chat-home]');
   const form = document.querySelector('[data-chat-form]');
   const input = document.querySelector('[data-chat-input]');
   const thread = document.querySelector('[data-chat-thread]');
@@ -958,16 +981,20 @@ import { suggestedPrompts } from '../data/chatPresets';
     message.className = `chat-message chat-message--${role}`;
     message.textContent = text;
     thread?.append(message);
+    message.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    return message;
   }
 
   function submitMessage(text) {
     const value = text.trim();
     if (!value) return;
+    home?.classList.add('chat-home--active');
     addMessage('user', value);
-    addMessage('assistant', '正在整理一小段回答...');
-    const pending = thread?.lastElementChild;
+    const pending = addMessage('assistant', '正在整理一小段回答');
+    pending.classList.add('chat-message--typing');
     window.setTimeout(() => {
-      if (pending) pending.textContent = getSimulatedReply(value);
+      pending.classList.remove('chat-message--typing');
+      pending.textContent = getSimulatedReply(value);
     }, 420);
   }
 
@@ -1010,13 +1037,16 @@ Append to `src/styles/global.css`:
 .chat-home {
   min-height: 100vh;
   display: grid;
-  place-items: center;
+  grid-template-rows: 1fr auto;
   padding: 36px;
 }
 
-.chat-home__center {
+.chat-home__intro {
+  align-self: center;
+  justify-self: center;
   width: min(780px, 100%);
   text-align: center;
+  transition: opacity 180ms ease, transform 180ms ease;
 }
 
 .chat-home h1 {
@@ -1035,6 +1065,22 @@ Append to `src/styles/global.css`:
   border-radius: 30px;
   background: #fff;
   box-shadow: 0 18px 42px rgba(32, 37, 31, 0.08);
+}
+
+.chat-home__composer {
+  width: min(780px, 100%);
+  justify-self: center;
+  align-self: center;
+}
+
+.chat-home--active .chat-home__intro {
+  display: none;
+}
+
+.chat-home--active .chat-home__composer {
+  position: sticky;
+  bottom: 24px;
+  align-self: end;
 }
 
 .chat-box input {
@@ -1066,7 +1112,9 @@ Append to `src/styles/global.css`:
 .chat-thread {
   display: grid;
   gap: 10px;
-  margin-top: 28px;
+  width: min(780px, 100%);
+  margin: 0 auto 28px;
+  align-content: end;
   text-align: left;
 }
 
@@ -1085,6 +1133,18 @@ Append to `src/styles/global.css`:
 
 .chat-message--assistant {
   justify-self: start;
+}
+
+.chat-message--typing::after {
+  content: "▋";
+  color: var(--accent);
+  animation: chat-cursor 1s step-end infinite;
+}
+
+@keyframes chat-cursor {
+  50% {
+    opacity: 0;
+  }
 }
 ```
 
@@ -1126,23 +1186,92 @@ import { getCollection } from 'astro:content';
 import ContentLayout from '../../layouts/ContentLayout.astro';
 
 const essays = (await getCollection('essays')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const years = [...new Set(essays.map((essay) => String(essay.data.date.getFullYear())))];
+const tags = [...new Set(essays.flatMap((essay) => essay.data.tags))];
 ---
 
 <ContentLayout title="随笔" eyebrow="Essays">
-  <div class="entry-list">
-    {essays.map((essay) => (
-      <a class="entry-card" href={`/essays/${essay.slug}`}>
-        <time datetime={essay.data.date.toISOString()}>{essay.data.date.toLocaleDateString('zh-CN')}</time>
-        <h2>{essay.data.title}</h2>
-        <p>{essay.data.summary}</p>
-        <div class="tag-row">
-          {essay.data.mood && <span>{essay.data.mood}</span>}
-          {essay.data.tags.map((tag) => <span>{tag}</span>)}
+  <div class="essay-index">
+    <div class="entry-list" data-essay-list>
+      {essays.map((essay) => (
+        <a class="entry-card" href={`/essays/${essay.slug}`} data-year={essay.data.date.getFullYear()} data-tags={essay.data.tags.join(',')}>
+          <time datetime={essay.data.date.toISOString()}>{essay.data.date.toLocaleDateString('zh-CN')}</time>
+          <div>
+            <h2>{essay.data.title}</h2>
+            <p>{essay.data.summary}</p>
+            <div class="tag-row">
+              {essay.data.mood && <span>{essay.data.mood}</span>}
+              {essay.data.tags.map((tag) => <span>{tag}</span>)}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <aside class="essay-filter" aria-label="随笔筛选">
+      <section>
+        <h2>时间</h2>
+        <div class="filter-row">
+          <button type="button" class="filter-chip is-active" data-filter-year="all">全部</button>
+          {years.map((year) => <button type="button" class="filter-chip" data-filter-year={year}>{year}</button>)}
         </div>
-      </a>
-    ))}
+      </section>
+
+      <section>
+        <h2>标签</h2>
+        <div class="filter-row">
+          <button type="button" class="filter-chip is-active" data-filter-tag="all">全部</button>
+          {tags.map((tag) => <button type="button" class="filter-chip" data-filter-tag={tag}>{tag}</button>)}
+        </div>
+      </section>
+
+      <section>
+        <h2>和这些文字聊天</h2>
+        <a class="essay-chat-link" href="/?prompt=%E9%9A%8F%E6%9C%BA%E8%81%8A%E4%B8%80%E7%AF%87%E9%9A%8F%E7%AC%94">随机聊一篇随笔</a>
+        <a class="essay-chat-link" href="/?prompt=%E8%BF%99%E4%BA%9B%E9%9A%8F%E7%AC%94%E5%8F%8D%E5%A4%8D%E5%9C%A8%E5%86%99%E4%BB%80%E4%B9%88">这些随笔反复在写什么？</a>
+      </section>
+    </aside>
   </div>
 </ContentLayout>
+
+<script>
+  const yearButtons = document.querySelectorAll('[data-filter-year]');
+  const tagButtons = document.querySelectorAll('[data-filter-tag]');
+  const entries = document.querySelectorAll('[data-year][data-tags]');
+  let selectedYear = 'all';
+  let selectedTag = 'all';
+
+  function updateActive(buttons, selectedValue, attribute) {
+    buttons.forEach((button) => {
+      button.classList.toggle('is-active', button.getAttribute(attribute) === selectedValue);
+    });
+  }
+
+  function applyFilters() {
+    entries.forEach((entry) => {
+      const yearMatches = selectedYear === 'all' || entry.getAttribute('data-year') === selectedYear;
+      const tagList = (entry.getAttribute('data-tags') ?? '').split(',');
+      const tagMatches = selectedTag === 'all' || tagList.includes(selectedTag);
+      entry.toggleAttribute('hidden', !(yearMatches && tagMatches));
+    });
+    updateActive(yearButtons, selectedYear, 'data-filter-year');
+    updateActive(tagButtons, selectedTag, 'data-filter-tag');
+  }
+
+  yearButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedYear = button.getAttribute('data-filter-year') ?? 'all';
+      applyFilters();
+    });
+  });
+
+  tagButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedTag = button.getAttribute('data-filter-tag') ?? 'all';
+      applyFilters();
+    });
+  });
+</script>
 ```
 
 - [ ] **Step 2: Create essay detail page**
@@ -1181,8 +1310,16 @@ Append to `src/styles/global.css`:
   gap: 14px;
 }
 
+.essay-index {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 42px;
+}
+
 .entry-card {
-  display: block;
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 28px;
   padding: 18px 0;
   border-bottom: 1px solid var(--line);
 }
@@ -1214,6 +1351,65 @@ Append to `src/styles/global.css`:
   padding: 3px 9px;
   color: var(--muted);
   font-size: 0.86rem;
+}
+
+.essay-filter {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  border-left: 1px solid var(--line);
+  padding-left: 22px;
+}
+
+.essay-filter section + section {
+  margin-top: 24px;
+}
+
+.essay-filter h2 {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip,
+.essay-chat-link {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.filter-chip.is-active {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.essay-chat-link {
+  display: block;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 900px) {
+  .essay-index {
+    grid-template-columns: 1fr;
+  }
+
+  .essay-filter {
+    position: static;
+    border-left: 0;
+    padding-left: 0;
+  }
 }
 
 .prose {
@@ -1609,23 +1805,45 @@ git commit -m "feat: add timeline axis"
 - Create: `src/pages/about.astro`
 - Modify: `src/styles/global.css`
 
-- [ ] **Step 1: Create inactive guestbook form**
+- [ ] **Step 1: Create guestbook modal form**
 
 Create `src/components/GuestbookForm.astro`:
 
 ```astro
-<form class="guestbook-form" aria-describedby="guestbook-status">
-  <label>
-    名字
-    <input type="text" name="name" placeholder="怎么称呼你" disabled />
-  </label>
-  <label>
-    留言
-    <textarea name="message" rows="5" placeholder="想留下一点什么" disabled></textarea>
-  </label>
-  <button type="button" disabled>暂未开放提交</button>
-  <p id="guestbook-status">这里以后会放下经过确认的留言。第一版先保留入口，不收集内容。</p>
-</form>
+<button type="button" class="guestbook-open" data-open-guestbook>留下留言</button>
+
+<dialog class="guestbook-dialog" data-guestbook-dialog>
+  <div class="guestbook-dialog__head">
+    <strong>留下一点痕迹</strong>
+    <button type="button" data-close-guestbook aria-label="关闭留言窗口">关闭</button>
+  </div>
+  <form class="guestbook-form" aria-describedby="guestbook-status">
+    <label>
+      名字
+      <input type="text" name="name" placeholder="怎么称呼你" disabled />
+    </label>
+    <label>
+      留言
+      <textarea name="message" rows="5" placeholder="想留下一点什么" disabled></textarea>
+    </label>
+    <button type="button" disabled>暂未开放提交</button>
+    <p id="guestbook-status">第一版先保留入口，不收集内容。以后这里会接入提交、审核和反垃圾。</p>
+  </form>
+</dialog>
+
+<script>
+  const dialog = document.querySelector('[data-guestbook-dialog]');
+  const openButton = document.querySelector('[data-open-guestbook]');
+  const closeButton = document.querySelector('[data-close-guestbook]');
+
+  openButton?.addEventListener('click', () => {
+    if (dialog instanceof HTMLDialogElement) dialog.showModal();
+  });
+
+  closeButton?.addEventListener('click', () => {
+    if (dialog instanceof HTMLDialogElement) dialog.close();
+  });
+</script>
 ```
 
 - [ ] **Step 2: Create guestbook page**
@@ -1636,11 +1854,41 @@ Create `src/pages/guestbook.astro`:
 ---
 import GuestbookForm from '../components/GuestbookForm.astro';
 import ContentLayout from '../layouts/ContentLayout.astro';
+
+const visitors = [
+  {
+    name: '林间',
+    time: '刚刚访问',
+    message: '这里的首页很像一个能慢慢靠近的入口。希望以后能看到更多音乐记录。',
+  },
+  {
+    name: 'Moon',
+    time: '昨天访问',
+    message: '随机聊一篇随笔这个入口很好，像抽到一张小纸条。',
+  },
+  {
+    name: '周末读者',
+    time: '三天前访问',
+    message: '时间线那条轴线很安静，不像在展示成就，更像在标记生活。',
+  },
+];
 ---
 
 <ContentLayout title="访客簿" eyebrow="Guestbook">
-  <p class="lead">留下一点痕迹。这个入口会先安静地放在这里。</p>
-  <GuestbookForm />
+  <div class="guestbook-head">
+    <p class="lead">最近来过的人，和他们留下的一点痕迹。</p>
+    <GuestbookForm />
+  </div>
+
+  <div class="visitor-grid">
+    {visitors.map((visitor) => (
+      <article class="visitor-card">
+        <p class="visitor-card__meta">{visitor.time}</p>
+        <h2>{visitor.name}</h2>
+        <p>{visitor.message}</p>
+      </article>
+    ))}
+  </div>
 </ContentLayout>
 ```
 
@@ -1667,10 +1915,78 @@ import ContentLayout from '../layouts/ContentLayout.astro';
 Append to `src/styles/global.css`:
 
 ```css
+.guestbook-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.guestbook-open {
+  border: 0;
+  border-radius: 999px;
+  background: var(--text);
+  color: #fff;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.visitor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.visitor-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.visitor-card__meta,
+.visitor-card p {
+  color: var(--muted);
+}
+
+.visitor-card h2 {
+  margin: 4px 0 6px;
+  font-size: 1.15rem;
+}
+
+.guestbook-dialog {
+  width: min(520px, calc(100% - 32px));
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 28px 70px rgba(32, 37, 31, 0.14);
+}
+
+.guestbook-dialog::backdrop {
+  background: rgba(32, 37, 31, 0.18);
+}
+
+.guestbook-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.guestbook-dialog__head button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  padding: 6px 10px;
+}
+
 .guestbook-form {
   display: grid;
   gap: 16px;
-  max-width: 560px;
 }
 
 .guestbook-form label {
@@ -1700,6 +2016,17 @@ Append to `src/styles/global.css`:
 
 .guestbook-form p {
   color: var(--muted);
+}
+
+@media (max-width: 760px) {
+  .guestbook-head {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .visitor-grid {
+    grid-template-columns: 1fr;
+  }
 }
 ```
 
@@ -1817,7 +2144,16 @@ test('homepage sends a simulated chat reply', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '我们从哪里开始呢？' })).toBeVisible();
   await page.getByLabel('输入问题').fill('你最近在想什么？');
   await page.getByRole('button', { name: '发送' }).click();
+  await expect(page.locator('.chat-home--active')).toBeVisible();
   await expect(page.getByText('最近我在想怎么把一些松散的内容收拢起来')).toBeVisible();
+});
+
+test('essays can be filtered by tag', async ({ page }) => {
+  await page.goto('/essays');
+  await expect(page.getByRole('heading', { name: '随笔' })).toBeVisible();
+  await page.getByRole('button', { name: '音乐' }).click();
+  await expect(page.getByText('把声音留住')).toBeVisible();
+  await expect(page.getByText('夜里散步')).toHaveCount(0);
 });
 
 test('reviews tabs expose music book and film', async ({ page }) => {
@@ -1834,6 +2170,13 @@ test('timeline does not expose private notes', async ({ page }) => {
   await page.goto('/timeline');
   await expect(page.getByRole('heading', { name: '时间线' })).toBeVisible();
   await expect(page.getByText('这件事对我意味着重新整理自己的表达方式')).toHaveCount(0);
+});
+
+test('guestbook shows visitors and opens inactive message modal', async ({ page }) => {
+  await page.goto('/guestbook');
+  await expect(page.getByText('林间')).toBeVisible();
+  await page.getByRole('button', { name: '留下留言' }).click();
+  await expect(page.getByRole('button', { name: '暂未开放提交' })).toBeVisible();
 });
 
 test('mobile layout keeps navigation and content usable', async ({ page }) => {
@@ -1884,13 +2227,15 @@ git commit -m "test: add site smoke tests"
 Spec coverage:
 
 - ChatGPT-like homepage: Task 4 and Task 10.
+- Chat active state with bottom composer and simulated streaming: Task 4 and Task 10.
 - Sidebar with modules and chat list: Task 3.
 - Essays list/detail: Task 5.
+- Essay time/tag filters: Task 5 and Task 10.
 - `/reviews` with music/book/film tabs: Task 6.
 - Review covers and cover schema: Task 2 and Task 6.
 - Content index pages use the available right-side workspace: Task 3 and Task 6.
 - Coordinate-axis timeline: Task 7.
-- Semi-real guestbook: Task 8.
+- Semi-real guestbook with recent visitor messages and modal form: Task 8 and Task 10.
 - About page: Task 8.
 - Hidden persona configuration, no public persona route: Task 9.
 - Private timeline notes not publicly visible: Task 2, Task 7, Task 10.
