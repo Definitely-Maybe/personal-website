@@ -1113,8 +1113,8 @@ Append to `src/styles/global.css`:
   display: grid;
   gap: 10px;
   width: min(780px, 100%);
-  margin: 0 auto 28px;
-  align-content: end;
+  margin: 0 auto 120px;
+  align-content: start;
   text-align: left;
 }
 

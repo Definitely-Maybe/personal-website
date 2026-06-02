@@ -36,7 +36,7 @@ The homepage is the AI chat experience.
 The chat has two visual states:
 
 - Initial state: opening line and composer are centered, like a quiet ChatGPT-style start screen.
-- Active conversation state: after the visitor sends a message or clicks a prompt, the message thread appears and the composer moves to the bottom of the main area. Simulated replies should appear with a streaming/typing state before resolving.
+- Active conversation state: after the visitor sends a message or clicks a prompt, the message thread appears in the upper reading area and the composer moves to the bottom of the main area. Simulated replies should appear with a streaming/typing state before resolving.
 
 The AI is presented as a conversational persona derived from the author's public writing and hidden persona configuration, not as the author being personally online.
 
