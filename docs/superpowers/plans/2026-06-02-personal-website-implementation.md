@@ -19,6 +19,12 @@ Create this structure:
 ├── astro.config.mjs
 ├── package.json
 ├── playwright.config.ts
+├── public/
+│   └── covers/
+│       └── reviews/
+│           ├── after-hours.svg
+│           ├── private-language.svg
+│           └── late-spring.svg
 ├── tsconfig.json
 ├── vitest.config.ts
 ├── src/
@@ -315,6 +321,10 @@ describe('content schemas', () => {
       year: 2020,
       rating: 8.5,
       summary: '霓虹、疲惫和一点危险的浪漫。',
+      cover: {
+        src: '/covers/reviews/after-hours.svg',
+        alt: 'After Hours 的风格化封面',
+      },
       tags: ['流行', '夜晚'],
       moments: ['夜里走路'],
       visibility: 'public',
@@ -375,6 +385,10 @@ export const reviewSchema = z.object({
   year: z.number().int(),
   rating: z.number().min(0).max(10),
   summary: z.string(),
+  cover: z.object({
+    src: z.string(),
+    alt: z.string(),
+  }),
   tags: z.array(z.string()).default([]),
   moments: z.array(z.string()).default([]),
   visibility: visibilitySchema,
@@ -459,6 +473,9 @@ date: 2026-06-02
 year: 2020
 rating: 8.5
 summary: 霓虹、疲惫和一点危险的浪漫。
+cover:
+  src: /covers/reviews/after-hours.svg
+  alt: After Hours 的风格化封面
 tags: [音乐, 流行, 夜晚]
 moments: [夜里走路, 情绪很满的时候]
 visibility: public
@@ -480,6 +497,9 @@ date: 2026-06-02
 year: 1953
 rating: 8
 summary: 有些问题不是为了回答，而是为了把问题本身看清。
+cover:
+  src: /covers/reviews/private-language.svg
+  alt: 私人语言的风格化封面
 tags: [书籍, 哲学]
 moments: [需要重新校准语言的时候]
 visibility: public
@@ -499,6 +519,9 @@ date: 2026-06-02
 year: 1949
 rating: 9
 summary: 克制到几乎透明，却让人很难不被击中。
+cover:
+  src: /covers/reviews/late-spring.svg
+  alt: 晚春的风格化封面
 tags: [影视, 日本电影]
 moments: [想安静地看完一段人生的时候]
 visibility: public
@@ -541,6 +564,41 @@ privateNotesPolicy: owner_only
 
 - [ ] **Step 5: Verify schemas and Astro content**
 
+Create stylized local cover assets for the sample reviews.
+
+Create `public/covers/reviews/after-hours.svg`:
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="After Hours 的风格化封面">
+  <rect width="600" height="600" fill="#161b19"/>
+  <circle cx="430" cy="170" r="110" fill="#b4934f"/>
+  <path d="M0 600L600 190V600z" fill="#587f74"/>
+  <text x="48" y="500" fill="#fffefa" font-family="serif" font-size="54">After Hours</text>
+</svg>
+```
+
+Create `public/covers/reviews/private-language.svg`:
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 620" role="img" aria-label="私人语言的风格化封面">
+  <rect width="420" height="620" fill="#f6f0df"/>
+  <rect width="42" height="620" fill="#d8cdb7"/>
+  <circle cx="285" cy="180" r="82" fill="#dcebe4"/>
+  <text x="82" y="480" fill="#263024" font-family="serif" font-size="48">私人语言</text>
+</svg>
+```
+
+Create `public/covers/reviews/late-spring.svg`:
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 620" role="img" aria-label="晚春的风格化封面">
+  <rect width="420" height="620" fill="#efe8db"/>
+  <rect y="340" width="420" height="280" fill="#789069"/>
+  <path d="M60 380C130 300 230 300 320 380" fill="none" stroke="#fffefa" stroke-width="10"/>
+  <text x="76" y="520" fill="#fffefa" font-family="serif" font-size="54">晚春</text>
+</svg>
+```
+
 Run:
 
 ```powershell
@@ -555,7 +613,7 @@ Expected: tests pass and Astro validates content without schema errors.
 Run:
 
 ```powershell
-git add src/content tests/content-schema.test.ts
+git add src/content public/covers/reviews tests/content-schema.test.ts
 git commit -m "feat: define content collections"
 ```
 
@@ -688,7 +746,7 @@ Append to `src/styles/global.css`:
   border-right: 1px solid var(--line);
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 14px;
 }
 
 .sidebar__brand a {
@@ -721,12 +779,8 @@ Append to `src/styles/global.css`:
   background: var(--panel-strong);
 }
 
-.sidebar__chats {
-  margin-top: auto;
-}
-
 .content-page {
-  width: min(860px, calc(100% - 40px));
+  width: min(1120px, calc(100% - 48px));
   margin: 0 auto;
   padding: 64px 0;
 }
@@ -1163,6 +1217,7 @@ Append to `src/styles/global.css`:
 }
 
 .prose {
+  max-width: 760px;
   font-size: 1.06rem;
 }
 
@@ -1232,15 +1287,16 @@ const categories = [
     <section class="review-panel" data-review-panel={category.key} hidden={index !== 0}>
       {reviews.filter((review) => review.data.category === category.key).map((review) => (
         <article class="review-card">
-          <div>
+          <img class="review-card__cover" src={review.data.cover.src} alt={review.data.cover.alt} loading="lazy" />
+          <div class="review-card__body">
             <p>{review.data.creator} · {review.data.year}</p>
             <h2>{review.data.title}</h2>
             <p>{review.data.summary}</p>
-          </div>
-          <strong>{review.data.rating.toFixed(1)}</strong>
-          <div class="tag-row">
-            {review.data.tags.map((tag) => <span>{tag}</span>)}
-            {review.data.moments.map((moment) => <span>{moment}</span>)}
+            <strong>{review.data.rating.toFixed(1)}</strong>
+            <div class="tag-row">
+              {review.data.tags.map((tag) => <span>{tag}</span>)}
+              {review.data.moments.map((moment) => <span>{moment}</span>)}
+            </div>
           </div>
         </article>
       ))}
@@ -1312,16 +1368,32 @@ Append to `src/styles/global.css`:
 
 .review-panel {
   display: grid;
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
   margin-top: 24px;
 }
 
 .review-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 16px;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 18px;
+  min-height: 236px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.review-card__cover {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+.review-card__body {
+  min-width: 0;
 }
 
 .review-card h2,
@@ -1334,8 +1406,22 @@ Append to `src/styles/global.css`:
 }
 
 .review-card strong {
+  display: block;
+  margin-top: 14px;
   color: var(--gold);
   font-size: 1.5rem;
+}
+
+@media (max-width: 980px) {
+  .review-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .review-card {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
 }
 ```
 
@@ -1796,6 +1882,8 @@ Spec coverage:
 - Sidebar with modules and chat list: Task 3.
 - Essays list/detail: Task 5.
 - `/reviews` with music/book/film tabs: Task 6.
+- Review covers and cover schema: Task 2 and Task 6.
+- Content index pages use the available right-side workspace: Task 3 and Task 6.
 - Coordinate-axis timeline: Task 7.
 - Semi-real guestbook: Task 8.
 - About page: Task 8.

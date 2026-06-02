@@ -20,6 +20,8 @@ Astro is preferred because the site is content-heavy and should remain lightweig
 
 The site uses an application-like layout inspired by ChatGPT rather than a traditional blog homepage.
 
+The right-side main area should feel like a full workspace. The chat homepage uses a centered stage, but content index pages should occupy the available right-side width. Long-form article bodies may keep a narrower reading width inside that workspace.
+
 ### `/`
 
 The homepage is the AI chat experience.
@@ -74,6 +76,8 @@ Reviews page for books, music, and film/TV. The page uses three tabs:
 - 影视
 
 The navigation label is "书影音". The route is `/reviews`.
+
+Review entries should include covers. Music can use square covers; books and film/TV can use poster-like vertical covers. V1 may use locally stored cover artwork or stylized placeholder covers until the author supplies final assets.
 
 ### `/timeline`
 
@@ -146,6 +150,8 @@ Frontmatter:
 - `year`: work release year.
 - `rating`: numeric or display rating.
 - `summary`: one-line impression.
+- `cover.src`: local cover image path.
+- `cover.alt`: accessible cover description.
 - `tags`: string array.
 - `moments`: optional contexts, moods, or moments.
 - `visibility`: defaults to `public`.
@@ -332,6 +338,7 @@ Suggested palette:
 - Chat messages should feel calm and readable.
 - Content pages prioritize reading.
 - Reviews have a light archive/catalog feeling.
+- Reviews should occupy the available right-side workspace and use cover-led entries rather than tiny text-only cards.
 - Timeline has a coordinate-axis feeling.
 - Guestbook feels quiet and expectant.
 
@@ -383,4 +390,3 @@ Before considering v1 implementation complete:
 - Guestbook inactive state is clear.
 - Simulated chat can send a message and receive a response.
 - Mobile layout does not break or overlap.
-
