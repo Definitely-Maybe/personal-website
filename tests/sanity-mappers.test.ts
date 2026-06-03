@@ -1,10 +1,62 @@
 import { describe, expect, it } from 'vitest';
 import { fixtureEssays, fixtureReviews, fixtureTimelineEvents } from '../src/lib/content/fixtures';
+import { mapSanityEssay, mapSanityReview, mapSanityTimelineEvent } from '../src/lib/content/sanityMappers';
 
 describe('content fixtures', () => {
   it('provide stable sample data for local and e2e fallback', () => {
     expect(fixtureEssays.map((essay) => essay.slug)).toContain('night-walk');
     expect(fixtureReviews.some((review) => review.category === 'book')).toBe(true);
     expect(fixtureTimelineEvents[0].date).toBeInstanceOf(Date);
+  });
+});
+
+describe('Sanity mappers', () => {
+  it('maps essay documents into normalized essays', () => {
+    const essay = mapSanityEssay({
+      title: '夜里散步',
+      slug: 'night-walk',
+      date: '2026-06-02',
+      summary: '一段关于夜晚和走路的短记。',
+      tags: ['日常'],
+      mood: '安静',
+      body: [{ _type: 'block' }],
+    });
+
+    expect(essay.date).toBeInstanceOf(Date);
+    expect(essay.slug).toBe('night-walk');
+    expect(essay.tags).toEqual(['日常']);
+  });
+
+  it('maps review documents with a cover fallback', () => {
+    const review = mapSanityReview({
+      title: 'After Hours',
+      slug: 'album-after-hours',
+      category: 'music',
+      creator: 'The Weeknd',
+      year: 2020,
+      date: '2026-06-02',
+      rating: 8.5,
+      summary: '霓虹、疲惫和一点危险的浪漫。',
+      tags: ['夜晚'],
+      moments: ['夜里走路'],
+      body: [],
+    });
+
+    expect(review.cover?.src).toBe('/covers/reviews/after-hours.svg');
+    expect(review.rating).toBe(8.5);
+  });
+
+  it('maps timeline documents without private notes', () => {
+    const event = mapSanityTimelineEvent({
+      title: '开始搭个人网站',
+      slug: 'website-begins',
+      date: '2026-06-02',
+      summary: '把个人网站从想法推进到设计。',
+      tags: ['创作'],
+      body: [],
+    });
+
+    expect(event.summary).toContain('个人网站');
+    expect(Object.keys(event)).not.toContain('privateNotes');
   });
 });
