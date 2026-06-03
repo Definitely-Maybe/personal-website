@@ -1,0 +1,17 @@
+{
+  "name": "personal-website-studio",
+  "private": true,
+  "version": "0.2.0",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy"
+  },
+  "dependencies": {
+    "@sanity/vision": "^5.28.0",
+    "sanity": "^5.28.0",
+    "styled-components": "^6.4.2"
+  },
+  "devDependencies": {}
+}
