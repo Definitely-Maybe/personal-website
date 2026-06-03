@@ -6,3 +6,7 @@ dist/
 test-results/
 playwright-report/
 dev-server*.log
+.env
+.env.local
+.env.*.local
+!.env.example
