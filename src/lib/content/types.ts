@@ -1,0 +1,42 @@
+export type ReviewCategory = 'music' | 'book' | 'film';
+
+export type PortableBlock = Record<string, unknown>;
+
+export interface Essay {
+  title: string;
+  slug: string;
+  date: Date;
+  summary: string;
+  tags: string[];
+  mood?: string;
+  body: PortableBlock[];
+}
+
+export interface ReviewCover {
+  src: string;
+  alt: string;
+}
+
+export interface Review {
+  title: string;
+  slug: string;
+  category: ReviewCategory;
+  creator: string;
+  year: number;
+  date: Date;
+  rating: number;
+  cover?: ReviewCover;
+  summary: string;
+  tags: string[];
+  moments: string[];
+  body: PortableBlock[];
+}
+
+export interface TimelineEvent {
+  title: string;
+  slug: string;
+  date: Date;
+  summary: string;
+  tags: string[];
+  body: PortableBlock[];
+}
