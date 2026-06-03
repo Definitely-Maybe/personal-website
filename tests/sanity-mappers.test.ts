@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getEssayBySlug, getEssays, getReviews, getTimelineEvents } from '../src/lib/content';
 import { fixtureEssays, fixtureReviews, fixtureTimelineEvents } from '../src/lib/content/fixtures';
 import { mapSanityEssay, mapSanityReview, mapSanityTimelineEvent } from '../src/lib/content/sanityMappers';
 
@@ -58,5 +59,14 @@ describe('Sanity mappers', () => {
 
     expect(event.summary).toContain('个人网站');
     expect(Object.keys(event)).not.toContain('privateNotes');
+  });
+});
+
+describe('content access API', () => {
+  it('uses fixture content when Sanity is not configured', async () => {
+    await expect(getEssayBySlug('night-walk')).resolves.toMatchObject({ title: '夜里散步' });
+    await expect(getEssays()).resolves.toHaveLength(3);
+    await expect(getReviews()).resolves.toHaveLength(3);
+    await expect(getTimelineEvents()).resolves.toHaveLength(3);
   });
 });
