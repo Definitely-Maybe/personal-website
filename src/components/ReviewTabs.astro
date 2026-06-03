@@ -1,8 +1,8 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { Review } from '../lib/content/types';
 
 interface Props {
-  reviews: CollectionEntry<'reviews'>[];
+  reviews: Review[];
 }
 
 const { reviews } = Astro.props;
@@ -24,17 +24,17 @@ const categories = [
 
   {categories.map((category, index) => (
     <section class="review-panel" data-review-panel={category.key} hidden={index !== 0}>
-      {reviews.filter((review) => review.data.category === category.key).map((review) => (
+      {reviews.filter((review) => review.category === category.key).map((review) => (
         <article class="review-card">
-          <img class="review-card__cover" src={review.data.cover.src} alt={review.data.cover.alt} loading="lazy" />
+          <img class="review-card__cover" src={review.cover?.src ?? '/covers/reviews/after-hours.svg'} alt={review.cover?.alt ?? `${review.title} 封面`} loading="lazy" />
           <div class="review-card__body">
-            <p class="review-card__meta">{review.data.creator} · {review.data.year}</p>
-            <h2>{review.data.title}</h2>
-            <p>{review.data.summary}</p>
-            <strong>{review.data.rating.toFixed(1)}</strong>
+            <p class="review-card__meta">{review.creator} · {review.year}</p>
+            <h2>{review.title}</h2>
+            <p>{review.summary}</p>
+            <strong>{review.rating.toFixed(1)}</strong>
             <div class="tag-row">
-              {review.data.tags.map((tag) => <span>{tag}</span>)}
-              {review.data.moments.map((moment) => <span>{moment}</span>)}
+              {review.tags.map((tag) => <span>{tag}</span>)}
+              {review.moments.map((moment) => <span>{moment}</span>)}
             </div>
           </div>
         </article>

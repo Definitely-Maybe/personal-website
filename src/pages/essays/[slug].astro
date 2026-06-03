@@ -1,19 +1,29 @@
 ---
-import { getCollection, render } from 'astro:content';
+import PortableBody from '../../components/PortableBody.astro';
 import ContentLayout from '../../layouts/ContentLayout.astro';
+import { getEssayBySlug } from '../../lib/content';
 
-export async function getStaticPaths() {
-  const essays = await getCollection('essays');
-  return essays.map((essay) => ({ params: { slug: essay.slug }, props: { essay } }));
+export const prerender = false;
+
+const slug = Astro.params.slug ?? '';
+const essay = await getEssayBySlug(slug);
+
+if (!essay) {
+  Astro.response.status = 404;
 }
-
-const { essay } = Astro.props;
-const { Content } = await render(essay);
 ---
 
-<ContentLayout title={essay.data.title} eyebrow={essay.data.date.toLocaleDateString('zh-CN')}>
-  <article class="prose">
-    <p class="lead">{essay.data.summary}</p>
-    <Content />
-  </article>
-</ContentLayout>
+{essay ? (
+  <ContentLayout title={essay.title} eyebrow={essay.date.toLocaleDateString('zh-CN')}>
+    <article class="prose">
+      <p class="lead">{essay.summary}</p>
+      <PortableBody value={essay.body} />
+    </article>
+  </ContentLayout>
+) : (
+  <ContentLayout title="没有找到这篇随笔" eyebrow="404">
+    <article class="prose">
+      <p class="lead">它可能还没有发布，或者已经被重新整理到了别处。</p>
+    </article>
+  </ContentLayout>
+)}

@@ -1,9 +1,11 @@
 ---
-import { getCollection } from 'astro:content';
 import TimelineAxis from '../components/TimelineAxis.astro';
 import ContentLayout from '../layouts/ContentLayout.astro';
+import { getTimelineEvents } from '../lib/content';
 
-const events = (await getCollection('timeline')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+export const prerender = false;
+
+const events = (await getTimelineEvents()).sort((a, b) => b.date.valueOf() - a.date.valueOf());
 ---
 
 <ContentLayout title="时间线" eyebrow="Timeline" description="一些公开的坐标点。更私人的意义不在这里展开。">

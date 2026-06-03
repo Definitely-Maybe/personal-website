@@ -1,6 +1,10 @@
 export type ReviewCategory = 'music' | 'book' | 'film';
 
-export type PortableBlock = Record<string, unknown>;
+export type PortableBlock = {
+  _type: string;
+  _key?: string;
+  [key: string]: unknown;
+};
 
 export interface Essay {
   title: string;

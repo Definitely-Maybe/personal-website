@@ -1,8 +1,8 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { TimelineEvent } from '../lib/content/types';
 
 interface Props {
-  events: CollectionEntry<'timeline'>[];
+  events: TimelineEvent[];
 }
 
 const { events } = Astro.props;
@@ -11,12 +11,12 @@ const { events } = Astro.props;
 <ol class="timeline-axis" aria-label="时间线">
   {events.map((event) => (
     <li>
-      <time datetime={event.data.date.toISOString()}>{event.data.date.toLocaleDateString('zh-CN')}</time>
+      <time datetime={event.date.toISOString()}>{event.date.toLocaleDateString('zh-CN')}</time>
       <div>
-        <h2>{event.data.title}</h2>
-        <p>{event.data.summary}</p>
+        <h2>{event.title}</h2>
+        <p>{event.summary}</p>
         <div class="tag-row">
-          {event.data.tags.map((tag) => <span>{tag}</span>)}
+          {event.tags.map((tag) => <span>{tag}</span>)}
         </div>
       </div>
     </li>

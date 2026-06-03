@@ -1,9 +1,11 @@
 ---
-import { getCollection } from 'astro:content';
 import ReviewTabs from '../components/ReviewTabs.astro';
 import ContentLayout from '../layouts/ContentLayout.astro';
+import { getReviews } from '../lib/content';
 
-const reviews = (await getCollection('reviews')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+export const prerender = false;
+
+const reviews = (await getReviews()).sort((a, b) => b.date.valueOf() - a.date.valueOf());
 ---
 
 <ContentLayout title="书影音" eyebrow="Reviews" description="不是为了客观排名，而是保存某个时刻被作品击中的方式。">

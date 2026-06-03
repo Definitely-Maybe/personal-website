@@ -1,24 +1,26 @@
 ---
-import { getCollection } from 'astro:content';
 import ContentLayout from '../../layouts/ContentLayout.astro';
+import { getEssays } from '../../lib/content';
 
-const essays = (await getCollection('essays')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const years = [...new Set(essays.map((essay) => String(essay.data.date.getFullYear())))];
-const tags = [...new Set(essays.flatMap((essay) => essay.data.tags))];
+export const prerender = false;
+
+const essays = (await getEssays()).sort((a, b) => b.date.valueOf() - a.date.valueOf());
+const years = [...new Set(essays.map((essay) => String(essay.date.getFullYear())))];
+const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
 ---
 
 <ContentLayout title="随笔" eyebrow="Essays" description="生活里一些没有被整理成结论的片段，先放在这里。">
   <div class="essay-index">
     <div class="entry-list" data-essay-list>
       {essays.map((essay) => (
-        <a class="entry-card" href={`/essays/${essay.slug}`} data-year={essay.data.date.getFullYear()} data-tags={essay.data.tags.join(',')}>
-          <time datetime={essay.data.date.toISOString()}>{essay.data.date.toLocaleDateString('zh-CN')}</time>
+        <a class="entry-card" href={`/essays/${essay.slug}`} data-year={essay.date.getFullYear()} data-tags={essay.tags.join(',')}>
+          <time datetime={essay.date.toISOString()}>{essay.date.toLocaleDateString('zh-CN')}</time>
           <div>
-            <h2>{essay.data.title}</h2>
-            <p>{essay.data.summary}</p>
+            <h2>{essay.title}</h2>
+            <p>{essay.summary}</p>
             <div class="tag-row">
-              {essay.data.mood && <span>{essay.data.mood}</span>}
-              {essay.data.tags.map((tag) => <span>{tag}</span>)}
+              {essay.mood && <span>{essay.mood}</span>}
+              {essay.tags.map((tag) => <span>{tag}</span>)}
             </div>
           </div>
         </a>
