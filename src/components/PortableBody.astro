@@ -1,0 +1,13 @@
+---
+import { toHTML } from '@portabletext/to-html';
+import type { PortableBlock } from '../lib/content/types';
+
+interface Props {
+  value?: PortableBlock[];
+}
+
+const { value = [] } = Astro.props;
+const html = value.length > 0 ? toHTML(value) : '';
+---
+
+{html ? <Fragment set:html={html} /> : <p>这段内容还在整理中。</p>}
