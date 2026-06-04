@@ -77,23 +77,54 @@ const categories = [
     const paginationNav = pagination;
     const items = Array.from(list.querySelectorAll<HTMLElement>('[data-page-item]'));
     const pageSize = Number(paginationNav.dataset.pageSize ?? 6);
+    const first = paginationNav.querySelector<HTMLButtonElement>('[data-page-first]');
     const prev = paginationNav.querySelector<HTMLButtonElement>('[data-page-prev]');
     const next = paginationNav.querySelector<HTMLButtonElement>('[data-page-next]');
+    const last = paginationNav.querySelector<HTMLButtonElement>('[data-page-last]');
     const status = paginationNav.querySelector<HTMLElement>('[data-page-status]');
+    const pageNumbers = paginationNav.querySelector<HTMLElement>('[data-page-numbers]');
     let page = 1;
+
+    function renderPageButtons(pageCount: number) {
+      if (!pageNumbers) return;
+      pageNumbers.innerHTML = '';
+      for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'pagination__page';
+        button.textContent = String(pageNumber);
+        button.setAttribute('aria-label', `第 ${pageNumber} 页`);
+        if (pageNumber === page) {
+          button.setAttribute('aria-current', 'page');
+        }
+        button.addEventListener('click', () => {
+          page = pageNumber;
+          render();
+        });
+        pageNumbers.append(button);
+      }
+    }
 
     function render() {
       const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
       page = Math.min(page, pageCount);
+      renderPageButtons(pageCount);
       items.forEach((item, index) => {
         const visible = index >= (page - 1) * pageSize && index < page * pageSize;
         item.toggleAttribute('hidden', !visible);
       });
       paginationNav.hidden = items.length <= pageSize;
       if (status) status.textContent = `第 ${page} / ${pageCount} 页`;
+      if (first) first.disabled = page <= 1;
       if (prev) prev.disabled = page <= 1;
       if (next) next.disabled = page >= pageCount;
+      if (last) last.disabled = page >= pageCount;
     }
+
+    first?.addEventListener('click', () => {
+      page = 1;
+      render();
+    });
 
     prev?.addEventListener('click', () => {
       page -= 1;
@@ -102,6 +133,16 @@ const categories = [
 
     next?.addEventListener('click', () => {
       page += 1;
+      render();
+    });
+
+    last?.addEventListener('click', () => {
+      page = Math.max(1, Math.ceil(items.length / pageSize));
+      render();
+    });
+
+    panel.addEventListener('reset-pagination', () => {
+      page = 1;
       render();
     });
 
@@ -116,6 +157,9 @@ const categories = [
       tabs.forEach((item) => item.setAttribute('aria-selected', String(item === tab)));
       panels.forEach((panel) => {
         panel.toggleAttribute('hidden', panel.getAttribute('data-review-panel') !== selected);
+        if (panel.getAttribute('data-review-panel') === selected) {
+          panel.dispatchEvent(new CustomEvent('reset-pagination'));
+        }
       });
     });
   });

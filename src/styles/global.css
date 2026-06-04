@@ -479,7 +479,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
+  min-height: 38px;
   margin-top: 24px;
   color: var(--muted);
   font-size: 0.9rem;
@@ -489,12 +490,31 @@ button {
   display: none;
 }
 
+.pagination__pages {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .pagination button {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(255, 254, 250, 0.78);
   color: var(--muted);
-  padding: 6px 12px;
+  padding: 0 10px;
+}
+
+.pagination__arrow {
+  font-size: 1.05rem;
+}
+
+.pagination__page[aria-current="page"] {
+  background: var(--accent-soft);
+  color: var(--text);
 }
 
 .pagination button:disabled {

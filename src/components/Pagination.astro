@@ -8,7 +8,10 @@ const { label, pageSize } = Astro.props;
 ---
 
 <nav class="pagination" aria-label={label} data-pagination data-page-size={pageSize} hidden>
-  <button type="button" data-page-prev aria-label="上一页">上一页</button>
-  <span data-page-status>第 1 页</span>
-  <button type="button" data-page-next aria-label="下一页">下一页</button>
+  <button class="pagination__arrow" type="button" data-page-first aria-label="第一页">«</button>
+  <button class="pagination__arrow" type="button" data-page-prev aria-label="上一页">‹</button>
+  <div class="pagination__pages" data-page-numbers aria-label="页码"></div>
+  <button class="pagination__arrow" type="button" data-page-next aria-label="下一页">›</button>
+  <button class="pagination__arrow" type="button" data-page-last aria-label="最后一页">»</button>
+  <span class="sr-only" data-page-status aria-live="polite">第 1 页</span>
 </nav>

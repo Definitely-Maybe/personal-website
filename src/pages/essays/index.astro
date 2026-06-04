@@ -61,9 +61,12 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
   const pagination = document.querySelector<HTMLElement>('[data-pagination]');
   const emptyFilter = document.querySelector<HTMLElement>('[data-empty-filter]');
   const pageSize = Number(pagination?.dataset.pageSize ?? 6);
+  const first = pagination?.querySelector<HTMLButtonElement>('[data-page-first]');
   const prev = pagination?.querySelector<HTMLButtonElement>('[data-page-prev]');
   const next = pagination?.querySelector<HTMLButtonElement>('[data-page-next]');
+  const last = pagination?.querySelector<HTMLButtonElement>('[data-page-last]');
   const status = pagination?.querySelector<HTMLElement>('[data-page-status]');
+  const pageNumbers = pagination?.querySelector<HTMLElement>('[data-page-numbers]');
   let selectedYear = 'all';
   let selectedTag = 'all';
   let page = 1;
@@ -72,6 +75,26 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
     buttons.forEach((button) => {
       button.classList.toggle('is-active', button.getAttribute(attribute) === selectedValue);
     });
+  }
+
+  function renderPageButtons(pageCount: number) {
+    if (!pageNumbers) return;
+    pageNumbers.innerHTML = '';
+    for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'pagination__page';
+      button.textContent = String(pageNumber);
+      button.setAttribute('aria-label', `第 ${pageNumber} 页`);
+      if (pageNumber === page) {
+        button.setAttribute('aria-current', 'page');
+      }
+      button.addEventListener('click', () => {
+        page = pageNumber;
+        render();
+      });
+      pageNumbers.append(button);
+    }
   }
 
   function getFilteredEntries() {
@@ -87,6 +110,7 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
     const filteredEntries = getFilteredEntries();
     const pageCount = Math.max(1, Math.ceil(filteredEntries.length / pageSize));
     page = Math.min(page, pageCount);
+    renderPageButtons(pageCount);
 
     entries.forEach((entry) => entry.toggleAttribute('hidden', true));
     filteredEntries.forEach((entry, index) => {
@@ -97,8 +121,10 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
     if (emptyFilter) emptyFilter.hidden = filteredEntries.length > 0;
     if (pagination) pagination.hidden = filteredEntries.length <= pageSize;
     if (status) status.textContent = `第 ${page} / ${pageCount} 页`;
+    if (first) first.disabled = page <= 1;
     if (prev) prev.disabled = page <= 1;
     if (next) next.disabled = page >= pageCount;
+    if (last) last.disabled = page >= pageCount;
 
     updateActive(yearButtons, selectedYear, 'data-filter-year');
     updateActive(tagButtons, selectedTag, 'data-filter-tag');
@@ -120,6 +146,11 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
     });
   });
 
+  first?.addEventListener('click', () => {
+    page = 1;
+    render();
+  });
+
   prev?.addEventListener('click', () => {
     page -= 1;
     render();
@@ -127,6 +158,11 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
 
   next?.addEventListener('click', () => {
     page += 1;
+    render();
+  });
+
+  last?.addEventListener('click', () => {
+    page = Math.max(1, Math.ceil(getFilteredEntries().length / pageSize));
     render();
   });
 
