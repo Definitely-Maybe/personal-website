@@ -36,15 +36,15 @@ describe('Sanity mappers', () => {
       creator: 'The Weeknd',
       year: 2020,
       date: '2026-06-02',
-      rating: 8.5,
+      rating: 4.3,
       summary: '霓虹、疲惫和一点危险的浪漫。',
       tags: ['夜晚'],
       moments: ['夜里走路'],
       body: [],
     });
 
-    expect(review.cover?.src).toBe('/covers/reviews/after-hours.svg');
-    expect(review.rating).toBe(8.5);
+    expect(review.cover?.src).toBe('/covers/reviews/default-music.png');
+    expect(review.rating).toBe(4.3);
   });
 
   it('maps timeline documents without private notes', () => {

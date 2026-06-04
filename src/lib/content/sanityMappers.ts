@@ -1,4 +1,5 @@
 import { getSanityImageUrl } from '../sanity/image';
+import { clampReviewRating, getDefaultReviewCover } from '../reviews/display';
 import type { Essay, PortableBlock, Review, ReviewCategory, TimelineEvent } from './types';
 
 interface SanityBaseDocument {
@@ -53,18 +54,21 @@ export function mapSanityEssay(doc: SanityEssayDocument): Essay {
 
 export function mapSanityReview(doc: SanityReviewDocument): Review {
   const title = text(doc.title);
+  const category = doc.category ?? 'music';
+  const imageUrl = getSanityImageUrl(doc.cover);
+  const fallbackCover = getDefaultReviewCover(category);
 
   return {
     title,
     slug: text(doc.slug),
-    category: doc.category ?? 'music',
+    category,
     creator: text(doc.creator),
     year: typeof doc.year === 'number' ? doc.year : 0,
     date: dateOrEpoch(doc.date),
-    rating: typeof doc.rating === 'number' ? doc.rating : 0,
+    rating: clampReviewRating(typeof doc.rating === 'number' ? doc.rating : 0),
     cover: {
-      src: getSanityImageUrl(doc.cover) ?? '/covers/reviews/after-hours.svg',
-      alt: `${title} 封面`,
+      src: imageUrl ?? fallbackCover.src,
+      alt: imageUrl ? `${title} 封面` : fallbackCover.alt,
     },
     summary: text(doc.summary),
     tags: stringArray(doc.tags),

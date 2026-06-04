@@ -28,6 +28,7 @@ export interface Review {
   creator: string;
   year: number;
   date: Date;
+  /** 0 to 5, supports one decimal place. */
   rating: number;
   cover?: ReviewCover;
   summary: string;
