@@ -66,3 +66,11 @@ test('mobile layout keeps navigation and content usable', async ({ page }) => {
   await expect(page.getByRole('link', { name: '随笔', exact: true })).toBeVisible();
   await expect(page.getByPlaceholder('问我一首歌、一篇随笔，或者一个适合今天的问题')).toBeVisible();
 });
+
+test('desktop sidebar stays visible while content scrolls', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/reviews');
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(page.getByRole('link', { name: '未命名的小站' })).toBeInViewport();
+  await expect(page.getByRole('link', { name: '书影音', exact: true })).toBeInViewport();
+});
