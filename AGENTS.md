@@ -26,7 +26,22 @@
 
 开始实现前，先阅读最新的 `docs/superpowers/specs` 和 `docs/superpowers/plans`。
 
-不要把未确认的未来方向提前做进当前版本。尤其是登录、真实 AI、RAG、真实访客簿、私密内容库。
+每个版本按固定流程推进：
+
+1. 收集需求。
+2. 生成版本需求文档 `spec`。
+3. 确认需求边界。
+4. 生成实现计划 `plan`。
+5. 按 Superpowers 流程开发。
+6. 本地验证。
+7. 提交 commit。
+8. 推送 GitHub。
+9. 在推送 GitHub 时，通过 GitHub 上的版本更新说明记录该版本主要更新。
+
+需求文档和实现计划放在：
+
+- `docs/superpowers/specs/`
+- `docs/superpowers/plans/`
 
 UI 修改应延续现有极简、温和、内容优先的风格。
 
