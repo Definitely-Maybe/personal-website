@@ -9,12 +9,13 @@ test('homepage sends a simulated chat reply and moves composer into active state
   await expect(page.getByText('最近我在想怎么把一些松散的内容收拢起来')).toBeVisible();
 });
 
-test('essays can be filtered by tag', async ({ page }) => {
+test('essays can be filtered by tag and keep pagination state valid', async ({ page }) => {
   await page.goto('/essays');
   await expect(page.getByRole('heading', { name: '随笔' })).toBeVisible();
   await page.getByRole('button', { name: '音乐' }).click();
   await expect(page.getByText('把声音留住')).toBeVisible();
   await expect(page.getByText('夜里散步')).toBeHidden();
+  await expect(page.getByText('没有符合这个筛选的随笔。')).toBeHidden();
 });
 
 test('reviews tabs expose only the selected category with rating and detail links', async ({ page }) => {

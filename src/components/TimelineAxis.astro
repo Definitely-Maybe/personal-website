@@ -1,4 +1,5 @@
 ---
+import EmptyState from './EmptyState.astro';
 import type { TimelineEvent } from '../lib/content/types';
 
 interface Props {
@@ -8,17 +9,21 @@ interface Props {
 const { events } = Astro.props;
 ---
 
-<ol class="timeline-axis" aria-label="时间线">
-  {events.map((event) => (
-    <li>
-      <time datetime={event.date.toISOString()}>{event.date.toLocaleDateString('zh-CN')}</time>
-      <div>
-        <h2>{event.title}</h2>
-        <p>{event.summary}</p>
-        <div class="tag-row">
-          {event.tags.map((tag) => <span>{tag}</span>)}
+{events.length > 0 ? (
+  <ol class="timeline-axis" aria-label="时间线">
+    {events.map((event) => (
+      <li>
+        <time datetime={event.date.toISOString()}>{event.date.toLocaleDateString('zh-CN')}</time>
+        <div>
+          <h2>{event.title}</h2>
+          <p>{event.summary}</p>
+          <div class="tag-row">
+            {event.tags.map((tag) => <span>{tag}</span>)}
+          </div>
         </div>
-      </div>
-    </li>
-  ))}
-</ol>
+      </li>
+    ))}
+  </ol>
+) : (
+  <EmptyState title="这里还没有公开的时间坐标。" description="之后再慢慢把一些节点放上来。" />
+)}

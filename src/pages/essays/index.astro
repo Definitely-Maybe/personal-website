@@ -1,4 +1,6 @@
 ---
+import EmptyState from '../../components/EmptyState.astro';
+import Pagination from '../../components/Pagination.astro';
 import ContentLayout from '../../layouts/ContentLayout.astro';
 import { getEssays } from '../../lib/content';
 
@@ -11,20 +13,25 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
 
 <ContentLayout title="随笔" eyebrow="Essays" description="生活里一些没有被整理成结论的片段，先放在这里。">
   <div class="essay-index">
-    <div class="entry-list" data-essay-list>
-      {essays.map((essay) => (
-        <a class="entry-card" href={`/essays/${essay.slug}`} data-year={essay.date.getFullYear()} data-tags={essay.tags.join(',')}>
-          <time datetime={essay.date.toISOString()}>{essay.date.toLocaleDateString('zh-CN')}</time>
-          <div>
-            <h2>{essay.title}</h2>
-            <p>{essay.summary}</p>
-            <div class="tag-row">
-              {essay.mood && <span>{essay.mood}</span>}
-              {essay.tags.map((tag) => <span>{tag}</span>)}
+    <div class="essay-results">
+      <div class="entry-list" data-essay-list>
+        {essays.map((essay) => (
+          <a class="entry-card" href={`/essays/${essay.slug}`} data-year={essay.date.getFullYear()} data-tags={essay.tags.join(',')} data-page-item>
+            <time datetime={essay.date.toISOString()}>{essay.date.toLocaleDateString('zh-CN')}</time>
+            <div>
+              <h2>{essay.title}</h2>
+              <p>{essay.summary}</p>
+              <div class="tag-row">
+                {essay.mood && <span>{essay.mood}</span>}
+                {essay.tags.map((tag) => <span>{tag}</span>)}
+              </div>
             </div>
-          </div>
-        </a>
-      ))}
+          </a>
+        ))}
+        <EmptyState title="这里还没有公开的随笔。" hidden={essays.length > 0} />
+        <EmptyState title="没有符合这个筛选的随笔。" hidden data-empty-filter />
+      </div>
+      <Pagination label="随笔分页" pageSize={6} />
     </div>
 
     <aside class="essay-filter" aria-label="随笔筛选">
@@ -50,9 +57,16 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
 <script>
   const yearButtons = document.querySelectorAll('[data-filter-year]');
   const tagButtons = document.querySelectorAll('[data-filter-tag]');
-  const entries = document.querySelectorAll('[data-year][data-tags]');
+  const entries = Array.from(document.querySelectorAll<HTMLElement>('[data-year][data-tags][data-page-item]'));
+  const pagination = document.querySelector<HTMLElement>('[data-pagination]');
+  const emptyFilter = document.querySelector<HTMLElement>('[data-empty-filter]');
+  const pageSize = Number(pagination?.dataset.pageSize ?? 6);
+  const prev = pagination?.querySelector<HTMLButtonElement>('[data-page-prev]');
+  const next = pagination?.querySelector<HTMLButtonElement>('[data-page-next]');
+  const status = pagination?.querySelector<HTMLElement>('[data-page-status]');
   let selectedYear = 'all';
   let selectedTag = 'all';
+  let page = 1;
 
   function updateActive(buttons: NodeListOf<Element>, selectedValue: string, attribute: string) {
     buttons.forEach((button) => {
@@ -60,13 +74,32 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
     });
   }
 
-  function applyFilters() {
-    entries.forEach((entry) => {
+  function getFilteredEntries() {
+    return entries.filter((entry) => {
       const yearMatches = selectedYear === 'all' || entry.getAttribute('data-year') === selectedYear;
       const tagList = (entry.getAttribute('data-tags') ?? '').split(',');
       const tagMatches = selectedTag === 'all' || tagList.includes(selectedTag);
-      entry.toggleAttribute('hidden', !(yearMatches && tagMatches));
+      return yearMatches && tagMatches;
     });
+  }
+
+  function render() {
+    const filteredEntries = getFilteredEntries();
+    const pageCount = Math.max(1, Math.ceil(filteredEntries.length / pageSize));
+    page = Math.min(page, pageCount);
+
+    entries.forEach((entry) => entry.toggleAttribute('hidden', true));
+    filteredEntries.forEach((entry, index) => {
+      const visible = index >= (page - 1) * pageSize && index < page * pageSize;
+      entry.toggleAttribute('hidden', !visible);
+    });
+
+    if (emptyFilter) emptyFilter.hidden = filteredEntries.length > 0;
+    if (pagination) pagination.hidden = filteredEntries.length <= pageSize;
+    if (status) status.textContent = `第 ${page} / ${pageCount} 页`;
+    if (prev) prev.disabled = page <= 1;
+    if (next) next.disabled = page >= pageCount;
+
     updateActive(yearButtons, selectedYear, 'data-filter-year');
     updateActive(tagButtons, selectedTag, 'data-filter-tag');
   }
@@ -74,14 +107,28 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
   yearButtons.forEach((button) => {
     button.addEventListener('click', () => {
       selectedYear = button.getAttribute('data-filter-year') ?? 'all';
-      applyFilters();
+      page = 1;
+      render();
     });
   });
 
   tagButtons.forEach((button) => {
     button.addEventListener('click', () => {
       selectedTag = button.getAttribute('data-filter-tag') ?? 'all';
-      applyFilters();
+      page = 1;
+      render();
     });
   });
+
+  prev?.addEventListener('click', () => {
+    page -= 1;
+    render();
+  });
+
+  next?.addEventListener('click', () => {
+    page += 1;
+    render();
+  });
+
+  render();
 </script>
