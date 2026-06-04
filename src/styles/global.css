@@ -206,16 +206,25 @@ button {
 
 .essay-index {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
   gap: 42px;
+  align-items: start;
+}
+
+.essay-results {
+  min-width: 0;
+  width: 100%;
 }
 
 .entry-list {
   display: grid;
   gap: 0;
+  min-width: 0;
 }
 
 .entry-card {
+  width: 100%;
+  min-width: 0;
   display: grid;
   grid-template-columns: 120px minmax(0, 1fr);
   gap: 28px;
@@ -261,6 +270,7 @@ button {
   position: sticky;
   top: 24px;
   align-self: start;
+  min-width: 0;
   border-left: 1px solid var(--line);
   padding-left: 22px;
 }

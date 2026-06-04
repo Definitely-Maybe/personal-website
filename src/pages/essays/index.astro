@@ -13,7 +13,7 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
 
 <ContentLayout title="随笔" eyebrow="Essays" description="生活里一些没有被整理成结论的片段，先放在这里。">
   <div class="essay-index">
-    <div class="essay-results">
+    <div class="essay-results" data-stable-results>
       <div class="entry-list" data-essay-list>
         {essays.map((essay) => (
           <a class="entry-card" href={`/essays/${essay.slug}`} data-year={essay.date.getFullYear()} data-tags={essay.tags.join(',')} data-page-item>
