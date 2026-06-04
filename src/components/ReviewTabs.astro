@@ -1,5 +1,9 @@
 ---
+import EmptyState from './EmptyState.astro';
+import Pagination from './Pagination.astro';
+import RatingStars from './RatingStars.astro';
 import type { Review } from '../lib/content/types';
+import { formatReviewDate, formatReviewRating, getReviewCover, hasLongReview } from '../lib/reviews/display';
 
 interface Props {
   reviews: Review[];
@@ -22,30 +26,89 @@ const categories = [
     ))}
   </div>
 
-  {categories.map((category, index) => (
-    <section class="review-panel" data-review-panel={category.key} hidden={index !== 0}>
-      {reviews.filter((review) => review.category === category.key).map((review) => (
-        <article class="review-card">
-          <img class="review-card__cover" src={review.cover?.src ?? '/covers/reviews/after-hours.svg'} alt={review.cover?.alt ?? `${review.title} 封面`} loading="lazy" />
-          <div class="review-card__body">
-            <p class="review-card__meta">{review.creator} · {review.year}</p>
-            <h2>{review.title}</h2>
-            <p>{review.summary}</p>
-            <strong>{review.rating.toFixed(1)}</strong>
-            <div class="tag-row">
-              {review.tags.map((tag) => <span>{tag}</span>)}
-              {review.moments.map((moment) => <span>{moment}</span>)}
-            </div>
-          </div>
-        </article>
-      ))}
-    </section>
-  ))}
+  {categories.map((category, index) => {
+    const categoryReviews = reviews.filter((review) => review.category === category.key);
+
+    return (
+      <section class="review-panel-wrap" data-review-panel={category.key} hidden={index !== 0}>
+        <div class="review-panel" data-paginated-list>
+          {categoryReviews.map((review) => {
+            const cover = getReviewCover(review);
+            const longReview = hasLongReview(review);
+
+            return (
+              <a class="review-card" href={`/reviews/${review.slug}`} data-page-item aria-label={`${review.title} 详情`}>
+                <img class="review-card__cover" src={cover.src} alt={cover.alt} loading="lazy" />
+                <div class="review-card__body">
+                  <p class="review-card__meta">{review.creator} · {review.year}</p>
+                  <p class="review-card__date">{formatReviewDate(review.date)}</p>
+                  <h2>{review.title}</h2>
+                  <p>{review.summary}</p>
+                  <div class="review-card__rating">
+                    <strong>{formatReviewRating(review.rating)}</strong>
+                    <RatingStars rating={review.rating} />
+                  </div>
+                  <div class="tag-row">
+                    {longReview && <span>长评</span>}
+                    {review.tags.map((tag) => <span>{tag}</span>)}
+                    {review.moments.map((moment) => <span>{moment}</span>)}
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+        <EmptyState title="这个分类暂时是空的，之后再慢慢补上。" hidden={categoryReviews.length > 0} />
+        <Pagination label={`${category.label}分页`} pageSize={6} />
+      </section>
+    );
+  })}
 </div>
 
 <script>
-  const tabs = document.querySelectorAll('[data-review-tab]');
-  const panels = document.querySelectorAll('[data-review-panel]');
+  const tabs = document.querySelectorAll<HTMLElement>('[data-review-tab]');
+  const panels = document.querySelectorAll<HTMLElement>('[data-review-panel]');
+
+  function setupPagination(panel: HTMLElement) {
+    const list = panel.querySelector<HTMLElement>('[data-paginated-list]');
+    const pagination = panel.querySelector<HTMLElement>('[data-pagination]');
+    if (!list || !pagination) return;
+
+    const paginationNav = pagination;
+    const items = Array.from(list.querySelectorAll<HTMLElement>('[data-page-item]'));
+    const pageSize = Number(paginationNav.dataset.pageSize ?? 6);
+    const prev = paginationNav.querySelector<HTMLButtonElement>('[data-page-prev]');
+    const next = paginationNav.querySelector<HTMLButtonElement>('[data-page-next]');
+    const status = paginationNav.querySelector<HTMLElement>('[data-page-status]');
+    let page = 1;
+
+    function render() {
+      const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
+      page = Math.min(page, pageCount);
+      items.forEach((item, index) => {
+        const visible = index >= (page - 1) * pageSize && index < page * pageSize;
+        item.toggleAttribute('hidden', !visible);
+      });
+      paginationNav.hidden = items.length <= pageSize;
+      if (status) status.textContent = `第 ${page} / ${pageCount} 页`;
+      if (prev) prev.disabled = page <= 1;
+      if (next) next.disabled = page >= pageCount;
+    }
+
+    prev?.addEventListener('click', () => {
+      page -= 1;
+      render();
+    });
+
+    next?.addEventListener('click', () => {
+      page += 1;
+      render();
+    });
+
+    render();
+  }
+
+  panels.forEach(setupPagination);
 
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {

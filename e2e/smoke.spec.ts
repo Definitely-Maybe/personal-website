@@ -17,14 +17,21 @@ test('essays can be filtered by tag', async ({ page }) => {
   await expect(page.getByText('夜里散步')).toBeHidden();
 });
 
-test('reviews tabs expose music book and film', async ({ page }) => {
+test('reviews tabs expose only the selected category with rating and detail links', async ({ page }) => {
   await page.goto('/reviews');
   await expect(page.getByRole('heading', { name: '书影音' })).toBeVisible();
-  await expect(page.getByRole('tab', { name: '音乐' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: '音乐' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('link', { name: /After Hours/ })).toBeVisible();
+  await expect(page.getByText('4.3/5')).toBeVisible();
+  await expect(page.getByText('记录于 2026.06.02')).toBeVisible();
+
   await page.getByRole('tab', { name: '书籍' }).click();
-  await expect(page.getByText('私人语言')).toBeVisible();
+  await expect(page.getByRole('link', { name: /私人语言/ })).toBeVisible();
+  await expect(page.getByText('After Hours')).toBeHidden();
+
   await page.getByRole('tab', { name: '影视' }).click();
-  await expect(page.getByText('晚春')).toBeVisible();
+  await expect(page.getByRole('link', { name: /晚春/ })).toBeVisible();
+  await expect(page.getByText('私人语言')).toBeHidden();
 });
 
 test('review detail pages show rating, record date, and long review state', async ({ page }) => {

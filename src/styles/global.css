@@ -327,6 +327,10 @@ button {
   gap: 18px;
 }
 
+.review-panel-wrap[hidden] {
+  display: none;
+}
+
 .review-card {
   min-height: 244px;
   display: grid;
@@ -336,6 +340,11 @@ button {
   border: 1px solid var(--line);
   border-radius: 12px;
   background: rgba(255, 254, 250, 0.82);
+  color: inherit;
+}
+
+.review-card[hidden] {
+  display: none;
 }
 
 .review-card__cover {
@@ -356,18 +365,78 @@ button {
   color: var(--muted);
 }
 
+.review-card__date {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .review-card h2 {
   margin: 4px 0 6px;
   font-size: 1.15rem;
 }
 
-.review-card strong {
+.review-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.review-card__rating strong {
   display: block;
-  margin-top: 16px;
+  margin: 0;
   color: var(--gold);
   font-family: var(--display-font);
-  font-size: 1.9rem;
+  font-size: 1.45rem;
   font-weight: 560;
+  line-height: 1;
+}
+
+.empty-state {
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  padding: 24px;
+  background: rgba(255, 254, 250, 0.56);
+  color: var(--muted);
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--text);
+}
+
+.empty-state span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.pagination[hidden] {
+  display: none;
+}
+
+.pagination button {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 254, 250, 0.78);
+  color: var(--muted);
+  padding: 6px 12px;
+}
+
+.pagination button:disabled {
+  cursor: default;
+  opacity: 0.45;
 }
 
 .rating-stars {

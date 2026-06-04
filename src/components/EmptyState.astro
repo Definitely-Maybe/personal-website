@@ -1,0 +1,14 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  hidden?: boolean;
+}
+
+const { title, description, hidden = false } = Astro.props;
+---
+
+<div class="empty-state" hidden={hidden}>
+  <p>{title}</p>
+  {description && <span>{description}</span>}
+</div>
