@@ -18,14 +18,6 @@ const categories = [
 ---
 
 <div class="review-tabs">
-  <div class="review-tabs__controls" role="tablist" aria-label="书影音分类">
-    {categories.map((category, index) => (
-      <button type="button" role="tab" aria-selected={index === 0 ? 'true' : 'false'} data-review-tab={category.key}>
-        {category.label}
-      </button>
-    ))}
-  </div>
-
   {categories.map((category, index) => {
     const categoryReviews = reviews.filter((review) => review.category === category.key);
 

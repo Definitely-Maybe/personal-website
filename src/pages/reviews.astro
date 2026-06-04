@@ -6,8 +6,20 @@ import { getReviews } from '../lib/content';
 export const prerender = false;
 
 const reviews = (await getReviews()).sort((a, b) => b.date.valueOf() - a.date.valueOf());
+const reviewCategories = [
+  { key: 'music', label: '音乐' },
+  { key: 'book', label: '书籍' },
+  { key: 'film', label: '影视' },
+] as const;
 ---
 
 <ContentLayout title="书影音" eyebrow="Reviews" description="不是为了客观排名，而是保存某个时刻被作品击中的方式。">
+  <div class="review-tabs__controls" role="tablist" aria-label="书影音分类" slot="controls">
+    {reviewCategories.map((category, index) => (
+      <button type="button" role="tab" aria-selected={index === 0 ? 'true' : 'false'} data-review-tab={category.key}>
+        {category.label}
+      </button>
+    ))}
+  </div>
   <ReviewTabs reviews={reviews} />
 </ContentLayout>

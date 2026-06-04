@@ -13,7 +13,7 @@ const hasControls = Astro.slots.has('controls');
 
 <AppLayout title={`${title} - 未命名的小站`}>
   <section class="content-page">
-    <div class="content-page__sticky">
+    <div class="content-page__sticky" data-sticky-page-header>
       <header class="page-head">
         <div>
           {eyebrow && <p class="eyebrow">{eyebrow}</p>}
@@ -30,3 +30,16 @@ const hasControls = Astro.slots.has('controls');
     <slot />
   </section>
 </AppLayout>
+
+<script>
+  const stickyHeaders = document.querySelectorAll<HTMLElement>('[data-sticky-page-header]');
+
+  function syncStickyHeaderState() {
+    stickyHeaders.forEach((header) => {
+      header.classList.toggle('is-stuck', window.scrollY > 80);
+    });
+  }
+
+  syncStickyHeaderState();
+  window.addEventListener('scroll', syncStickyHeaderState, { passive: true });
+</script>

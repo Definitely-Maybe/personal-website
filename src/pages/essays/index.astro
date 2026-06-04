@@ -12,6 +12,24 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
 ---
 
 <ContentLayout title="随笔" eyebrow="Essays" description="生活里一些没有被整理成结论的片段，先放在这里。">
+  <aside class="essay-filter" aria-label="随笔筛选" slot="controls">
+    <section>
+      <h2>时间</h2>
+      <div class="filter-row">
+        <button type="button" class="filter-chip is-active" data-filter-year="all">全部</button>
+        {years.map((year) => <button type="button" class="filter-chip" data-filter-year={year}>{year}</button>)}
+      </div>
+    </section>
+
+    <section>
+      <h2>标签</h2>
+      <div class="filter-row">
+        <button type="button" class="filter-chip is-active" data-filter-tag="all">全部</button>
+        {tags.map((tag) => <button type="button" class="filter-chip" data-filter-tag={tag}>{tag}</button>)}
+      </div>
+    </section>
+  </aside>
+
   <div class="essay-index">
     <div class="essay-results" data-stable-results>
       <div class="entry-list" data-essay-list>
@@ -33,24 +51,6 @@ const tags = [...new Set(essays.flatMap((essay) => essay.tags))];
       </div>
       <Pagination label="随笔分页" pageSize={6} />
     </div>
-
-    <aside class="essay-filter" aria-label="随笔筛选">
-      <section>
-        <h2>时间</h2>
-        <div class="filter-row">
-          <button type="button" class="filter-chip is-active" data-filter-year="all">全部</button>
-          {years.map((year) => <button type="button" class="filter-chip" data-filter-year={year}>{year}</button>)}
-        </div>
-      </section>
-
-      <section>
-        <h2>标签</h2>
-        <div class="filter-row">
-          <button type="button" class="filter-chip is-active" data-filter-tag="all">全部</button>
-          {tags.map((tag) => <button type="button" class="filter-chip" data-filter-tag={tag}>{tag}</button>)}
-        </div>
-      </section>
-    </aside>
   </div>
 </ContentLayout>
 
