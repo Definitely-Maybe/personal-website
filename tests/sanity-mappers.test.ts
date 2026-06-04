@@ -84,7 +84,14 @@ describe('content access API', () => {
   it('uses fixture content when Sanity is not configured', async () => {
     await expect(getEssayBySlug('night-walk')).resolves.toMatchObject({ title: '夜里散步' });
     await expect(getEssays()).resolves.toHaveLength(3);
-    await expect(getReviews()).resolves.toHaveLength(3);
+    await expect(getReviews()).resolves.toHaveLength(fixtureReviews.length);
+    await expect(getReviews()).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ category: 'music' }),
+        expect.objectContaining({ category: 'book' }),
+        expect.objectContaining({ category: 'film' }),
+      ]),
+    );
     await expect(getTimelineEvents()).resolves.toHaveLength(3);
   });
 });
