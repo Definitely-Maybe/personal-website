@@ -1,0 +1,33 @@
+---
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+  exitHref: string;
+}
+
+const { items, exitHref } = Astro.props;
+---
+
+<div class="detail-nav">
+  <nav class="breadcrumbs" aria-label="面包屑">
+    <ol>
+      {items.map((item, index) => {
+        const isCurrent = index === items.length - 1;
+        return (
+          <li>
+            {item.href && !isCurrent ? (
+              <a href={item.href}>{item.label}</a>
+            ) : (
+              <span aria-current={isCurrent ? 'page' : undefined}>{item.label}</span>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  </nav>
+  <a class="detail-nav__exit" href={exitHref}>退出阅读</a>
+</div>

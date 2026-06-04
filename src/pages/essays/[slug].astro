@@ -1,4 +1,5 @@
 ---
+import DetailNav from '../../components/DetailNav.astro';
 import PortableBody from '../../components/PortableBody.astro';
 import ContentLayout from '../../layouts/ContentLayout.astro';
 import { getEssayBySlug } from '../../lib/content';
@@ -15,6 +16,15 @@ if (!essay) {
 
 {essay ? (
   <ContentLayout title={essay.title} eyebrow={essay.date.toLocaleDateString('zh-CN')}>
+    <DetailNav
+      slot="controls"
+      items={[
+        { label: '首页', href: '/' },
+        { label: '随笔', href: '/essays' },
+        { label: essay.title },
+      ]}
+      exitHref="/essays"
+    />
     <article class="prose">
       <p class="lead">{essay.summary}</p>
       <PortableBody value={essay.body} />
