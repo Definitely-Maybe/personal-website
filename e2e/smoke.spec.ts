@@ -27,6 +27,18 @@ test('reviews tabs expose music book and film', async ({ page }) => {
   await expect(page.getByText('晚春')).toBeVisible();
 });
 
+test('review detail pages show rating, record date, and long review state', async ({ page }) => {
+  await page.goto('/reviews/album-after-hours');
+  await expect(page.getByRole('heading', { name: 'After Hours' })).toBeVisible();
+  await expect(page.getByText('4.3/5')).toBeVisible();
+  await expect(page.getByText('记录于 2026.06.02')).toBeVisible();
+  await expect(page.getByText('这张专辑像一条被灯光拖长的夜路。')).toBeVisible();
+
+  await page.goto('/reviews/book-private-language');
+  await expect(page.getByRole('heading', { name: '私人语言' })).toBeVisible();
+  await expect(page.getByText('这条记录目前只有短评。')).toBeVisible();
+});
+
 test('timeline does not expose private notes', async ({ page }) => {
   await page.goto('/timeline');
   await expect(page.getByRole('heading', { name: '时间线' })).toBeVisible();

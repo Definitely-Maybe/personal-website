@@ -40,6 +40,15 @@ function portableBody(value: unknown): PortableBlock[] {
   return Array.isArray(value) ? (value as PortableBlock[]) : [];
 }
 
+function reviewRating(value: unknown): number {
+  if (typeof value !== 'number') {
+    return 0;
+  }
+
+  const normalized = value > 5 && value <= 10 ? value / 2 : value;
+  return clampReviewRating(normalized);
+}
+
 export function mapSanityEssay(doc: SanityEssayDocument): Essay {
   return {
     title: text(doc.title),
@@ -65,7 +74,7 @@ export function mapSanityReview(doc: SanityReviewDocument): Review {
     creator: text(doc.creator),
     year: typeof doc.year === 'number' ? doc.year : 0,
     date: dateOrEpoch(doc.date),
-    rating: clampReviewRating(typeof doc.rating === 'number' ? doc.rating : 0),
+    rating: reviewRating(doc.rating),
     cover: {
       src: imageUrl ?? fallbackCover.src,
       alt: imageUrl ? `${title} 封面` : fallbackCover.alt,

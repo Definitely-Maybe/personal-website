@@ -1,0 +1,20 @@
+---
+import { formatReviewRating, getStarSegments } from '../lib/reviews/display';
+
+interface Props {
+  rating: number;
+}
+
+const { rating } = Astro.props;
+const segments = getStarSegments(rating);
+const label = formatReviewRating(rating);
+---
+
+<span class="rating-stars" aria-label={`评分 ${label}`}>
+  {segments.map((fill) => (
+    <span class="rating-stars__star" aria-hidden="true">
+      <span class="rating-stars__base">★</span>
+      <span class="rating-stars__fill" style={`width: ${fill}%`}>★</span>
+    </span>
+  ))}
+</span>

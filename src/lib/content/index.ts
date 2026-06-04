@@ -1,5 +1,5 @@
 import { sanityClient } from '../sanity/client';
-import { essayBySlugQuery, essaysQuery, reviewsQuery, timelineQuery } from '../sanity/queries';
+import { essayBySlugQuery, essaysQuery, reviewBySlugQuery, reviewsQuery, timelineQuery } from '../sanity/queries';
 import { fixtureEssays, fixtureReviews, fixtureTimelineEvents } from './fixtures';
 import { mapSanityEssay, mapSanityReview, mapSanityTimelineEvent } from './sanityMappers';
 import type { Essay, Review, TimelineEvent } from './types';
@@ -33,6 +33,15 @@ export async function getReviews(): Promise<Review[]> {
 
   const docs = await sanityClient!.fetch(reviewsQuery);
   return docs.map(mapSanityReview);
+}
+
+export async function getReviewBySlug(slug: string): Promise<Review | undefined> {
+  if (shouldUseFixtures()) {
+    return fixtureReviews.find((review) => review.slug === slug);
+  }
+
+  const doc = await sanityClient!.fetch(reviewBySlugQuery, { slug });
+  return doc ? mapSanityReview(doc) : undefined;
 }
 
 export async function getTimelineEvents(): Promise<TimelineEvent[]> {

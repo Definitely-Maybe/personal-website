@@ -1,0 +1,53 @@
+---
+import PortableBody from '../../components/PortableBody.astro';
+import RatingStars from '../../components/RatingStars.astro';
+import ContentLayout from '../../layouts/ContentLayout.astro';
+import { getReviewBySlug } from '../../lib/content';
+import { formatReviewDate, formatReviewRating, getReviewCover, hasLongReview } from '../../lib/reviews/display';
+
+export const prerender = false;
+
+const slug = Astro.params.slug ?? '';
+const review = await getReviewBySlug(slug);
+
+if (!review) {
+  Astro.response.status = 404;
+}
+
+const cover = review ? getReviewCover(review) : undefined;
+const longReview = review ? hasLongReview(review) : false;
+const categoryLabels = {
+  music: '音乐',
+  book: '书籍',
+  film: '影视',
+} as const;
+---
+
+{review ? (
+  <ContentLayout title={review.title} eyebrow={categoryLabels[review.category]} description={review.summary}>
+    <article class="review-detail">
+      <img class="review-detail__cover" src={cover?.src} alt={cover?.alt} />
+      <div class="review-detail__main">
+        <p class="review-detail__meta">{review.creator} · {review.year}</p>
+        <p class="review-detail__date">{formatReviewDate(review.date)}</p>
+        <div class="review-detail__rating">
+          <strong>{formatReviewRating(review.rating)}</strong>
+          <RatingStars rating={review.rating} />
+        </div>
+        <div class="tag-row">
+          {review.tags.map((tag) => <span>{tag}</span>)}
+          {review.moments.map((moment) => <span>{moment}</span>)}
+        </div>
+        <section class="prose review-detail__body">
+          {longReview ? <PortableBody value={review.body} /> : <p>这条记录目前只有短评。</p>}
+        </section>
+      </div>
+    </article>
+  </ContentLayout>
+) : (
+  <ContentLayout title="没有找到这条记录" eyebrow="404">
+    <article class="prose">
+      <p class="lead">它可能还没有发布，或者已经被重新整理到了别处。</p>
+    </article>
+  </ContentLayout>
+)}

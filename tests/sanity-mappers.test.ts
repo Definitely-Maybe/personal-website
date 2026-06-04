@@ -47,6 +47,24 @@ describe('Sanity mappers', () => {
     expect(review.rating).toBe(4.3);
   });
 
+  it('normalizes legacy 10-point Sanity review ratings into 5-point ratings', () => {
+    const review = mapSanityReview({
+      title: 'Melodrama',
+      slug: 'album-melodrama',
+      category: 'music',
+      creator: 'Lorde',
+      year: 2017,
+      date: '2026-06-03',
+      rating: 8.7,
+      summary: '把派对后的空旷写得很亮。',
+      tags: ['流行'],
+      moments: [],
+      body: [],
+    });
+
+    expect(review.rating).toBe(4.4);
+  });
+
   it('maps timeline documents without private notes', () => {
     const event = mapSanityTimelineEvent({
       title: '开始搭个人网站',
