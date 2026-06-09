@@ -1,12 +1,26 @@
 import { expect, test } from '@playwright/test';
 
-test('homepage sends a simulated chat reply and moves composer into active state', async ({ page }) => {
+test('homepage sends a chat reply and moves composer into active state', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: '我们从哪里开始呢？' })).toBeVisible();
   await page.getByLabel('输入问题').fill('你最近在想什么？');
   await page.getByRole('button', { name: '发送' }).click();
   await expect(page.locator('.chat-home--active')).toBeVisible();
-  await expect(page.getByText('最近我在想怎么把一些松散的内容收拢起来')).toBeVisible();
+  const assistant = page.locator('.chat-message--assistant').last();
+  await expect(assistant).not.toHaveText('正在整理一小段回答', { timeout: 15_000 });
+  await expect(assistant).not.toBeEmpty();
+});
+
+test('homepage chat history survives refresh in the same tab', async ({ page }) => {
+  await page.goto('/');
+  await page.getByLabel('输入问题').fill('介绍一下这个网站');
+  await page.getByRole('button', { name: '发送' }).click();
+  await expect(page.locator('.chat-message--user')).toHaveCount(1);
+  await expect(page.locator('.chat-message--assistant').last()).not.toBeEmpty({ timeout: 15_000 });
+
+  await page.reload();
+  await expect(page.locator('.chat-home--active')).toBeVisible();
+  await expect(page.locator('.chat-message--user')).toHaveCount(1);
+  await expect(page.locator('.chat-message--assistant').last()).not.toBeEmpty();
 });
 
 test('essays can be filtered by tag and keep pagination state valid', async ({ page }) => {

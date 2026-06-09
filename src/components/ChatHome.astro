@@ -26,6 +26,8 @@ import { suggestedPrompts } from '../data/chatPresets';
 </section>
 
 <script>
+  import { CHAT_STORAGE_KEY, truncateMessages } from '../lib/chat/session';
+  import type { ChatMessage } from '../lib/chat/types';
   import { getSimulatedReply } from '../data/chatPresets';
 
   const home = document.querySelector('[data-chat-home]');
@@ -43,19 +45,106 @@ import { suggestedPrompts } from '../data/chatPresets';
     return message;
   }
 
-  function submitMessage(text: string) {
+  function loadMessages(): ChatMessage[] {
+    try {
+      const raw = sessionStorage.getItem(CHAT_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveMessages(messages: ChatMessage[]) {
+    sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(truncateMessages(messages)));
+  }
+
+  function renderMessages(messages: ChatMessage[]) {
+    if (!thread) return;
+    thread.innerHTML = '';
+    for (const msg of messages) {
+      addMessage(msg.role, msg.content);
+    }
+  }
+
+  async function streamReply(messages: ChatMessage[], target: HTMLElement) {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages }),
+    });
+
+    if (!response.ok) {
+      if (import.meta.env.DEV && response.status === 503) {
+        target.textContent = getSimulatedReply(messages.at(-1)?.content ?? '');
+        return;
+      }
+      target.textContent = '暂时无法回答，请稍后再试。';
+      return;
+    }
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    target.textContent = '';
+    target.classList.add('chat-message--typing');
+
+    while (reader) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split('\n\n');
+      buffer = parts.pop() ?? '';
+      for (const part of parts) {
+        const line = part.split('\n').find((l) => l.startsWith('data: '));
+        if (!line) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') break;
+        try {
+          const json = JSON.parse(data) as { content?: string; error?: string };
+          if (json.error) {
+            target.textContent = json.error;
+            return;
+          }
+          if (json.content) {
+            target.classList.remove('chat-message--typing');
+            target.textContent += json.content;
+          }
+        } catch {
+          /* ignore malformed SSE chunks */
+        }
+      }
+    }
+  }
+
+  async function submitMessage(text: string) {
     const value = text.trim();
     if (!value) return;
 
     home?.classList.add('chat-home--active');
+
+    const messages = loadMessages();
+    messages.push({ role: 'user', content: value });
     addMessage('user', value);
+
     const pending = addMessage('assistant', '正在整理一小段回答');
     pending.classList.add('chat-message--typing');
 
-    window.setTimeout(() => {
-      pending.classList.remove('chat-message--typing');
-      pending.textContent = getSimulatedReply(value);
-    }, 520);
+    await streamReply(messages, pending);
+    pending.classList.remove('chat-message--typing');
+
+    const assistantText = pending.textContent ?? '';
+    if (assistantText && assistantText !== '正在整理一小段回答') {
+      messages.push({ role: 'assistant', content: assistantText });
+    }
+    saveMessages(messages);
+  }
+
+  const restored = loadMessages();
+  if (restored.length > 0) {
+    home?.classList.add('chat-home--active');
+    renderMessages(restored);
   }
 
   form?.addEventListener('submit', (event) => {

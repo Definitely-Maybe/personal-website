@@ -1,6 +1,6 @@
 # personal-website
 
-一个中文个人网站与个人博客。首页是模拟 AI 聊天入口，内容空间包括随笔、书影音、时间线、访客簿和关于页。
+一个中文个人网站与个人博客。首页是 AI 对话入口（v0.3 接入 DeepSeek 流式回复），内容空间包括随笔、书影音、时间线、访客簿和关于页。
 
 ## 本地开发
 
@@ -21,6 +21,19 @@ PUBLIC_CONTENT_SOURCE=auto
 ```
 
 未填写 `PUBLIC_SANITY_PROJECT_ID` 时，前台使用本地 fixture 内容。
+
+## AI 聊天（v0.3）
+
+```txt
+DEEPSEEK_API_KEY=
+DEEPSEEK_MODEL=deepseek-v4-pro
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+PERSONA_BRIEF=
+```
+
+- 本地未配置 `DEEPSEEK_API_KEY` 时，首页仍使用模拟回复。
+- 生产环境必须配置 `DEEPSEEK_API_KEY`。
+- `PERSONA_BRIEF` 为作者离线撰写的人格说明，不要提交到 Git。
 
 ## 内容后台
 
@@ -69,6 +82,13 @@ Sanity 管理三类公开内容：
 - 随笔和书影音分页升级为可点击页码的通用控件。
 - 修复随笔筛选时卡片宽度抖动。
 - 桌面端标题区和关键子导航在滚动时保持可见。
+
+## v0.3 AI 对话
+
+- 首页聊天接入 DeepSeek 流式 API（`deepseek-v4-pro`）。
+- 系统提示词由 `personaRules` 与 `PERSONA_BRIEF` 组装。
+- 同标签页内 sessionStorage 保留最近 10 轮对话。
+- 开发环境无 API Key 时自动回退模拟回复；生产环境返回 503。
 
 ## 内容安全
 

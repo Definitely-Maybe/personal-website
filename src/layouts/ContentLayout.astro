@@ -13,33 +13,45 @@ const hasControls = Astro.slots.has('controls');
 
 <AppLayout title={`${title} - 未命名的小站`}>
   <section class="content-page">
+    <div class="content-page__sticky-sentinel" aria-hidden="true"></div>
     <div class="content-page__sticky" data-sticky-page-header>
-      <header class="page-head">
-        <div>
-          {eyebrow && <p class="eyebrow">{eyebrow}</p>}
-          <h1>{title}</h1>
-        </div>
-        {description && <p class="page-description">{description}</p>}
-      </header>
-      {hasControls && (
-        <div class="page-controls">
-          <slot name="controls" />
-        </div>
-      )}
+      <div class="content-page__inner">
+        <header class="page-head">
+          <div>
+            {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+            <h1>{title}</h1>
+          </div>
+          {description && <p class="page-description">{description}</p>}
+        </header>
+        {hasControls && (
+          <div class="page-controls">
+            <slot name="controls" />
+          </div>
+        )}
+      </div>
     </div>
-    <slot />
+    <div class="content-page__inner">
+      <slot />
+    </div>
   </section>
 </AppLayout>
 
 <script>
   const stickyHeaders = document.querySelectorAll<HTMLElement>('[data-sticky-page-header]');
 
-  function syncStickyHeaderState() {
-    stickyHeaders.forEach((header) => {
-      header.classList.toggle('is-stuck', window.scrollY > 80);
-    });
-  }
+  stickyHeaders.forEach((header) => {
+    const sentinel = header.previousElementSibling;
+    if (!(sentinel instanceof HTMLElement) || !sentinel.classList.contains('content-page__sticky-sentinel')) {
+      return;
+    }
 
-  syncStickyHeaderState();
-  window.addEventListener('scroll', syncStickyHeaderState, { passive: true });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        header.classList.toggle('is-stuck', !entry.isIntersecting);
+      },
+      { threshold: 0 },
+    );
+
+    observer.observe(sentinel);
+  });
 </script>

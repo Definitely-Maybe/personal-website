@@ -13,6 +13,7 @@
   --white: #fffefa;
   --display-font: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
   --body-font: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --main-surface: var(--bg);
   font-family: var(--body-font);
 }
 
@@ -71,9 +72,7 @@ button {
 
 .app-main {
   min-width: 0;
-  background:
-    radial-gradient(circle at 50% 32%, rgba(220, 235, 228, 0.32), transparent 34%),
-    var(--bg);
+  background: var(--main-surface);
 }
 
 .sidebar {
@@ -164,29 +163,33 @@ button {
 }
 
 .content-page {
+  padding: 54px 0 72px;
+}
+
+.content-page__inner {
   width: min(1120px, calc(100% - 68px));
   margin: 0 auto;
-  padding: 54px 0 72px;
+}
+
+.content-page__sticky-sentinel {
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 .content-page__sticky {
   position: sticky;
   top: 0;
   z-index: 8;
-  margin: -54px 0 30px;
-  padding-top: 54px;
-  background:
-    linear-gradient(180deg, rgba(251, 250, 244, 0.98), rgba(251, 250, 244, 0.9)),
-    var(--bg);
+  margin: 0 0 30px;
+  padding-top: 0;
+  background: transparent;
   border-bottom: 1px solid transparent;
-  transition:
-    padding-top 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease;
 }
 
 .content-page__sticky.is-stuck {
-  padding-top: 14px;
+  background: var(--main-surface);
   border-bottom-color: rgba(88, 127, 116, 0.14);
   box-shadow: 0 10px 24px rgba(88, 127, 116, 0.06);
 }
@@ -196,17 +199,15 @@ button {
   grid-template-columns: minmax(0, 1fr) minmax(240px, 360px);
   align-items: end;
   gap: 42px;
-  margin-bottom: 32px;
-  transition:
-    gap 180ms ease,
-    margin-bottom 180ms ease;
+  margin-bottom: 20px;
+  transition: font-size 180ms ease;
 }
 
 .page-controls {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin: -12px 0 0;
+  margin: 0;
   padding-bottom: 14px;
 }
 
@@ -225,11 +226,6 @@ button {
   font-weight: 560;
   line-height: 1.08;
   transition: font-size 180ms ease;
-}
-
-.content-page__sticky.is-stuck .page-head {
-  gap: 28px;
-  margin-bottom: 16px;
 }
 
 .content-page__sticky.is-stuck .page-head h1 {
@@ -1034,14 +1030,14 @@ button {
   }
 
   .content-page__sticky.is-stuck {
-    padding-top: 0;
+    background: transparent;
     border-bottom: 0;
     box-shadow: none;
   }
 
   .page-controls {
     display: block;
-    margin: -10px 0 28px;
+    margin: 0 0 28px;
     padding-bottom: 0;
   }
 
